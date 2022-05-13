@@ -12,8 +12,6 @@
 
   @Description
     This source file provides main entry point for system initialization and application code development.
-    Altium Schematic:
-        https://formula-racing-at-uc-davis.365.altium.com/designs/C2ABC77D-921B-4D18-9284-6163FED32671?variant=%5BNo%20Variations%5D#design
     Generation Information :
         Product Revision  :  PIC24 / dsPIC33 / PIC32MM MCUs - 1.170.0
         Device            :  dsPIC33CH256MP505
@@ -22,14 +20,91 @@
         MPLAB 	          :  MPLAB X v5.45
 */
 
+/*
+    (c) 2020 Microchip Technology Inc. and its subsidiaries. You may use this
+    software and any derivatives exclusively with Microchip products.
+
+    THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
+    EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
+    WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
+    PARTICULAR PURPOSE, OR ITS INTERACTION WITH MICROCHIP PRODUCTS, COMBINATION
+    WITH ANY OTHER PRODUCTS, OR USE IN ANY APPLICATION.
+
+    IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
+    INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
+    WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
+    BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
+    FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
+    ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
+    THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
+
+    MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE
+    TERMS.
+*/
+
 /**
   Section: Included Files
 */
+//#ifndef _XTAL_FREQ
+//#define _XTAL_FREQ  8000000UL
+//#endif
+//
+//#ifndef FCY
+//#define FCY 8000000UL
+//#endif
+//
+//#include "mcc_generated_files/mcc.h"
+//#include "mcc_generated_files/system.h"
+//#include <libpic30.h>
+///*
+//                         Main application
+// */
+//
+///* Testing */
+//
+//int main(void)
+//{
+//    CAN_MSG_OBJ msg_RX;
+//    
+//    CAN_MSG_OBJ msg_TX;
+//    msg_TX.msgId = 0x02;
+//    uint8_t data_TX[1] = {0x03};
+//    msg_TX.data = data_TX;
+//    
+//    // initialize the device
+//    SYSTEM_Initialize();
+//    while (1)
+//    {
+////        if(CAN1_Receive(&msg_RX))
+////        {
+////            CAN1_Transmit(CAN1_TX_TXQ, &msg_TX);
+////        }
+//        CAN1_Transmit(CAN1_TX_TXQ, &msg_TX);
+//    }
+//    
+//    return 1;
+//}
+
+/* --------- */
+
+
+#ifndef _XTAL_FREQ
+#define _XTAL_FREQ  8000000UL
+#endif
+
+#ifndef FCY
+#define FCY 8000000UL
+#endif
+
 #include "mcc_generated_files/mcc.h"
 #include "mcc_generated_files/system.h"
+#include <libpic30.h>
 
 #include <string.h>
 #include <time.h>
+#include <math.h>
+#include <stdio.h>
+
 
 // States
 
@@ -51,6 +126,11 @@ typedef enum {
     BRAKE_IMPLAUSIBLE
 } error_t;
 
+
+typedef enum {
+    SWITCHES = 0x0d0,
+} CAN_ID;
+
 // Controls
 
 /*
@@ -60,31 +140,39 @@ typedef enum {
  * bit is high if corresponding switch is on, low otherwise
  * 
  * use in conditions:
- *  - Hv = switches & 0x10
- *  - Dr = switches & 0x1
+ *  - Hv = switches & 0b10
+ *  - Dr = switches & 0b1
  */
 volatile uint8_t switches = 0;
 
+CAN_MSG_OBJ msg_RX;
+
 // TODO: update switch status over CAN2 from Dashboard
-/*
 void can_receive() {
     // gets message
     // TODO: for now, just update switches (CAN ID = 0x0d0)
-    //switch(ID) {
-    //    case SWITCHES:
-    //        switches |= msg.data0 // update from message
-    //}
+    if (CAN1_Receive(&msg_RX)) {
+        printf("CAN message received.\n");
+        switch (msg_RX.msgId) {
+            case SWITCHES:
+                switches |= msg_RX.data[0]; // update from message
+                break;
+            default:
+                // no valid input received
+                printf("Not valid input.\n"); // replace this
+        }
+    } 
 }
-*/
+
 
 // TODO: may remove; was for pin, now uses global var
 uint8_t is_hv_requested() {
-    return 0;//switches & 0b10;//IO_RB2_GetValue();
+    return switches & 0b10;//IO_RB2_GetValue();
 }
 
 // TODO: may remove; was for pin, now uses global var
 uint8_t is_drive_requested() {
-    return 0;//IO_RB7_GetValue();
+    return switches & 0b1;//IO_RB7_GetValue();
 }
 
 // Pedals
@@ -111,6 +199,10 @@ uint16_t brake = 0;
 uint16_t brake_max = 0;
 uint16_t brake_min = 0;
 uint16_t brake_range = 0;
+
+#define MAX_DISCREPANCY_MS 100 
+unsigned int discrepancy_timer_ms = 0;
+#define AWAIT_DISCREPANCY_DELAY_MS 10
 
 // How long to wait for pre-charging to finish before timing out
 #define MAX_CONSERVATION_SECS 4
@@ -166,10 +258,10 @@ void report_fault(error_t _error) {
 }
 
 
-bool start_calibration = true;
+bool init_calibration = true;
 
 void run_calibration() {
-    if (start_calibration) {
+    if (init_calibration) {
         // set up values at start of calibration
         throttle1_max = 0;
         throttle1_min = 0x7FFF;
@@ -177,7 +269,7 @@ void run_calibration() {
         throttle2_min = 0x7FFF;
         brake_max = 0;
         brake_min = 0x7FFF;
-        start_calibration = false;
+        init_calibration = false;
     }
     else {
         // APPS1 = pin8 = RA0
@@ -265,7 +357,7 @@ bool brake_implausible() {
     
     if (state == FAULT && error == BRAKE_IMPLAUSIBLE) {
         // once brake implausibility detected, can only revert to normal if throttle unapplied
-        return !(temp_throttle < throttle_range * 0.25);
+        return !(temp_throttle < throttle_range * 0.05);
     }
     else {
         // if both brake and throttle applied, brake implausible
@@ -328,7 +420,6 @@ int main(void)
         printf("Brake : %d\r\n", brake);
         printf("HV switch: %d\r\n", is_hv_requested());
         printf("Drive switch: %d\r\n\n", is_drive_requested());
-        __delay_ms(1000);
     }
     #endif
     
@@ -343,6 +434,20 @@ int main(void)
         
         printf("-----------------------\r\n");
         
+        // CAN receive
+        can_receive();
+        
+        // CAN transmit state and throttle values
+        CAN_MSG_OBJ msg_TX_state;
+        msg_TX_state.msgId = 0x01;
+        uint8_t data_TX_state[1] = {state, throttle1, throttle2}; // state is 1 byte, throttle1 and throttle2 are ints
+        if (state == FAULT) { 
+            data_TX_state[0] = 0b10000000 + error; // greatest bit = 1 if fault 
+        }
+        msg_TX_state.data = data_TX_state;
+        CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_state);
+        
+
         switch (state) {
             case LV:
                 run_calibration();
@@ -410,6 +515,19 @@ int main(void)
                 break;
             case DRIVE:
                 update_sensor_vals();
+                
+                // Torque Request Command
+//                CAN_MSG_OBJ msg_TX_torque;
+//                msg_TX_torque.msgId = 0x02;
+//                uint8_t data_TX_throttle[1] = {0};
+//                if (is_hv_requested()) data_TX_throttle[1] &= (0b1 << 0);
+//                if (/*torque command upper*/) data_TX_throttle[1] &= (0b1 << 1);
+//                if (/*torque command lower*/) data_TX_throttle[1] &= (0b1 << 2);
+//                if (/*SOC*/) data_TX_throttle[1] &= (0b1 << 6);
+//                if (/*max BMS temp*/) data_TX_throttle[1] &= (0b1 << 7);
+//                msg_TX_torque.data = data_TX_torque;
+//                CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_torque);
+        
 
                 if (!is_drive_requested()) {
                     // Drive switch was flipped off
@@ -462,8 +580,11 @@ int main(void)
                     case SENSOR_DISCREPANCY:
                         update_sensor_vals();
                         
-                        // TODO: stop power to motors if discrepancy persists for >100ms
+                        // stop power to motors if discrepancy persists for >100ms
                         // see rule T.4.2.5 in FSAE 2022 rulebook
+                        if (discrepancy_timer_ms > MAX_DISCREPANCY_TIME) {
+                            change_state(LV);
+                        }
 
                         if (!has_discrepancy()) {
                             // if discrepancy resolved, change back to previous state
@@ -473,6 +594,10 @@ int main(void)
                                 change_state(temp_state);
                             }
                         }
+                        __delay_ms(AWAIT_DISCREPANCY_DELAY_MS);
+                        discrepancy_timer_ms += AWAIT_DISCREPANCY_DELAY_MS;
+                        // TODO: reset discrepancy timer after error resolved
+                        
                         break;
                     case BRAKE_IMPLAUSIBLE:
                         update_sensor_vals();
@@ -487,6 +612,8 @@ int main(void)
     }
 
 }
+
+
 /**
  End of File
 */
