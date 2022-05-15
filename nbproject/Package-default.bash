@@ -10,9 +10,9 @@ CND_CONF=default
 CND_DISTDIR=dist
 TMPDIR=build/${CND_CONF}/${IMAGE_TYPE}/tmp-packaging
 TMPDIRNAME=tmp-packaging
-OUTPUT_PATH=dist/${CND_CONF}/${IMAGE_TYPE}/VCU_Firmware_FE9_Remake.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
-OUTPUT_BASENAME=VCU_Firmware_FE9_Remake.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
-PACKAGE_TOP_DIR=vcufirmwarefe9remake.x/
+OUTPUT_PATH=dist/${CND_CONF}/${IMAGE_TYPE}/VCU-Firmware-FE9.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
+OUTPUT_BASENAME=VCU-Firmware-FE9.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
+PACKAGE_TOP_DIR=vcu-firmware-fe9/
 
 # Functions
 function checkReturnCode
@@ -57,15 +57,15 @@ mkdir -p ${TMPDIR}
 
 # Copy files and create directories and links
 cd "${TOP}"
-makeDirectory ${TMPDIR}/vcufirmwarefe9remake.x/bin
+makeDirectory ${TMPDIR}/vcu-firmware-fe9/bin
 copyFileToTmpDir "${OUTPUT_PATH}" "${TMPDIR}/${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}" 0755
 
 
 # Generate tar file
 cd "${TOP}"
-rm -f ${CND_DISTDIR}/${CND_CONF}/package/vcufirmwarefe9remake.x.tar
+rm -f ${CND_DISTDIR}/${CND_CONF}/package/vcu-firmware-fe9.tar
 cd ${TMPDIR}
-tar -vcf ../../../../${CND_DISTDIR}/${CND_CONF}/package/vcufirmwarefe9remake.x.tar *
+tar -vcf ../../../../${CND_DISTDIR}/${CND_CONF}/package/vcu-firmware-fe9.tar *
 checkReturnCode
 
 # Cleanup

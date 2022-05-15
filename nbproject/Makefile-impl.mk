@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=VCU_Firmware_FE9_Remake.X
+PROJECTNAME=VCU-Firmware-FE9
 
 # Active Configuration
 DEFAULTCONF=default

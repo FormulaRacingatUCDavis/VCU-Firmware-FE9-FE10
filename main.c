@@ -42,9 +42,9 @@
     TERMS.
 */
 
-/**
-  Section: Included Files
-*/
+
+/* Debug only */
+
 //#ifndef _XTAL_FREQ
 //#define _XTAL_FREQ  8000000UL
 //#endif
@@ -56,12 +56,7 @@
 //#include "mcc_generated_files/mcc.h"
 //#include "mcc_generated_files/system.h"
 //#include <libpic30.h>
-///*
-//                         Main application
-// */
-//
-///* Testing */
-//
+
 //int main(void)
 //{
 //    CAN_MSG_OBJ msg_RX;
@@ -85,8 +80,11 @@
 //    return 1;
 //}
 
-/* --------- */
+/*********/
 
+/**
+  Section: Included Files
+*/
 
 #ifndef _XTAL_FREQ
 #define _XTAL_FREQ  8000000UL
@@ -106,7 +104,7 @@
 #include <stdio.h>
 
 
-// States
+/************ States ************/ 
 
 typedef enum {
     LV,
@@ -125,94 +123,6 @@ typedef enum {
     SENSOR_DISCREPANCY,
     BRAKE_IMPLAUSIBLE
 } error_t;
-
-
-typedef enum {
-    SWITCHES = 0x0d0,
-} CAN_ID;
-
-// Controls
-
-/*
- * global variable for driver switch status
- * 
- * format: 0000 00HvDr
- * bit is high if corresponding switch is on, low otherwise
- * 
- * use in conditions:
- *  - Hv = switches & 0b10
- *  - Dr = switches & 0b1
- */
-volatile uint8_t switches = 0;
-
-CAN_MSG_OBJ msg_RX;
-
-// TODO: update switch status over CAN2 from Dashboard
-void can_receive() {
-    // gets message
-    // TODO: for now, just update switches (CAN ID = 0x0d0)
-    if (CAN1_Receive(&msg_RX)) {
-        printf("CAN message received.\n");
-        switch (msg_RX.msgId) {
-            case SWITCHES:
-                switches |= msg_RX.data[0]; // update from message
-                break;
-            default:
-                // no valid input received
-                printf("Not valid input.\n"); // replace this
-        }
-    } 
-}
-
-
-// TODO: may remove; was for pin, now uses global var
-uint8_t is_hv_requested() {
-    return switches & 0b10;//IO_RB2_GetValue();
-}
-
-// TODO: may remove; was for pin, now uses global var
-uint8_t is_drive_requested() {
-    return switches & 0b1;//IO_RB7_GetValue();
-}
-
-// Pedals
-// On the breadboard, the range of values for the potentiometer is 0 to 4095
-
-#define PEDAL_MAX 4095
-
-// There is some noise when reading from the brake pedal
-// So give some room for error when driver presses on brake
-#define BRAKE_ERROR_TOLERANCE 50
-
-
-uint16_t throttle1 = 0;
-uint16_t throttle2 = 0;
-uint16_t throttle1_max = 0;
-uint16_t throttle1_min = 0x7FFF;
-uint16_t throttle2_max = 0;
-uint16_t throttle2_min = 0x7FFF;
-uint16_t throttle_range = 0; // set after max and min values are calibrated
-uint16_t per_throttle1 = 0;
-uint16_t per_throttle2 = 0;
-
-uint16_t brake = 0;
-uint16_t brake_max = 0;
-uint16_t brake_min = 0;
-uint16_t brake_range = 0;
-
-#define MAX_DISCREPANCY_MS 100 
-unsigned int discrepancy_timer_ms = 0;
-#define AWAIT_DISCREPANCY_DELAY_MS 10
-
-// How long to wait for pre-charging to finish before timing out
-#define MAX_CONSERVATION_SECS 4
-// Keeps track of timer waiting for pre-charging
-unsigned int conservative_timer_ms = 0;
-// Delay between checking pre-charging state
-#define AWAIT_PRECHARGING_DELAY_MS 100
-
-// High voltage state variables
-#define DRIVE_REQ_DELAY_MS 1000
 
 // Initial FSM state
 state_t state = LV;
@@ -257,60 +167,89 @@ void report_fault(error_t _error) {
     error = _error;
 }
 
+// How long to wait for pre-charging to finish before timing out
+#define MAX_CONSERVATION_SECS 4
+// Keeps track of timer waiting for pre-charging
+unsigned int conservative_timer_ms = 0;
+// Delay between checking pre-charging state
+#define AWAIT_PRECHARGING_DELAY_MS 100
 
-bool init_calibration = true;
+// High voltage state variables
+#define DRIVE_REQ_DELAY_MS 1000
 
-void run_calibration() {
-    if (init_calibration) {
-        // set up values at start of calibration
-        throttle1_max = 0;
-        throttle1_min = 0x7FFF;
-        throttle2_max = 0;
-        throttle2_min = 0x7FFF;
-        brake_max = 0;
-        brake_min = 0x7FFF;
-        init_calibration = false;
-    }
-    else {
-        // APPS1 = pin8 = RA0
-        //throttle1 = ADCC_GetSingleConversion(channel_ANB0);
-        // APPS2 = pin9 = RA1
-        //throttle2 = ADCC_GetSingleConversion(channel_ANB1);
-        // BSE1 = pin11 = RA3
-        // BSE2 = pin12 = RA4
-        //brake = ADCC_GetSingleConversion(channel_ANB5);
 
-        if (throttle1 > throttle1_max) {
-            throttle1_max = throttle1;
-        }
-        if (throttle1 < throttle1_min) {
-            throttle1_min = throttle1;
-        }
-        if (throttle2 > throttle2_max) {
-            throttle2_max = throttle2;
-        }
-        if (throttle2 < throttle2_min) {
-            throttle2_min = throttle2;    
-        }
+/************ Switches ************/
 
-        if (brake > brake_max) {
-            brake_max = brake;
-        }
-        if (brake < brake_min) {
-            brake_min = brake;
-        }    
+/*
+ * global variable for driver switch status
+ * 
+ * format: 0000 00[Hv][Dr]
+ * bit is high if corresponding switch is on, low otherwise
+ * 
+ * use in conditions:
+ *  - Hv = switches & 0b10
+ *  - Dr = switches & 0b1
+ */
+volatile uint8_t switches = 0;
 
-         printf("throttle1: %d\r\n", throttle1);
-         printf("throttle1_max: %d\r\n", throttle1_max);
-         printf("throttle1_min: %d\r\n", throttle1_min); 
-         printf("throttle2: %d\r\n", throttle2);         
-         printf("throttle2_max: %d\r\n", throttle2_max);
-         printf("throttle2_min: %d\r\n", throttle2_min);
-         printf("brake: %d\r\n", brake);
-         printf("brake_max: %d\r\n", brake_max);
-         printf("brake_min: %d\r\n", brake_min);
+// TODO: may remove; was for pin, now uses global var
+uint8_t is_hv_requested() {
+    return switches & 0b10;//IO_RB2_GetValue();
+}
+
+// TODO: may remove; was for pin, now uses global var
+uint8_t is_drive_requested() {
+    return switches & 0b1;//IO_RB7_GetValue();
+}
+
+
+/************ Pedals ************/
+
+// APPS
+
+volatile double THROTTLE_MULTIPLIER;
+volatile uint8_t PACK_TEMP;
+
+const double THROTTLE_MAP[8] = { 95, 71, 59, 47, 35, 23, 11, 5 };
+
+void temp_attenuate() {
+    int t = PACK_TEMP - 50;
+    if (t < 0) {
+        THROTTLE_MULTIPLIER = 1;   
+    } else if (t < 8) {
+        THROTTLE_MULTIPLIER = THROTTLE_MAP[t] / 100.0; 
+    } else if (t >= 8) {
+        THROTTLE_MULTIPLIER = THROTTLE_MAP[7] / 100.0; 
     }
 }
+
+uint16_t throttle1 = 0;
+uint16_t throttle2 = 0;
+uint16_t throttle1_max = 0;
+uint16_t throttle1_min = 0x7FFF;
+uint16_t throttle2_max = 0;
+uint16_t throttle2_min = 0x7FFF;
+uint16_t throttle_range = 0; // set after max and min values are calibrated
+uint16_t per_throttle1 = 0;
+uint16_t per_throttle2 = 0;
+
+
+// Brake
+
+// There is some noise when reading from the brake pedal
+// So give some room for error when driver presses on brake
+#define BRAKE_ERROR_TOLERANCE 50
+
+uint16_t brake = 0;
+uint16_t brake_max = 0;
+uint16_t brake_min = 0;
+uint16_t brake_range = 0;
+
+// discrepancy timer
+#define MAX_DISCREPANCY_MS 100 
+unsigned int discrepancy_timer_ms = 0;
+#define AWAIT_DISCREPANCY_DELAY_MS 10
+
 
 // check differential between the throttle sensors
 // returns true only if the sensor discrepancy is > 10%
@@ -366,18 +305,91 @@ bool brake_implausible() {
     
 }
 
+//uint16_t getConversion(ADC1_CHANNEL channel){
+//    uint16_t conversion;
+//    ADC1_Enable();
+//    ADC1_ChannelSelect(channel);
+//    ADC1_SoftwareTriggerEnable();
+//    //Provide Delay
+//    __delay_ms(1);
+//    ADC1_SoftwareTriggerDisable();
+//    while(!ADC1_IsConversionComplete(channel));
+//    conversion = ADC1_ConversionResultGet(channel);
+//    ADC1_Disable();
+//    return conversion;
+//}
+
+
+// Update sensors
+
+// On the breadboard, the range of values for the potentiometer is 0 to 4095
+#define PEDAL_MAX 4095
+
+bool init_calibration = true;
+void run_calibration() {
+    if (init_calibration) {
+        // set up values at start of calibration
+        throttle1_max = 0;
+        throttle1_min = 0x7FFF;
+        throttle2_max = 0;
+        throttle2_min = 0x7FFF;
+        brake_max = 0;
+        brake_min = 0x7FFF;
+        init_calibration = false;
+    }
+    else {
+        // APPS1 = pin8 = RA0
+        //throttle1 = ADCC_GetSingleConversion(channel_ANB0);
+        // APPS2 = pin9 = RA1
+        //throttle2 = ADCC_GetSingleConversion(channel_ANB1);
+        // BSE1 = pin11 = RA3
+        // BSE2 = pin12 = RA4
+        //brake = ADCC_GetSingleConversion(channel_ANB5);
+
+        if (throttle1 > throttle1_max) {
+            throttle1_max = throttle1;
+        }
+        if (throttle1 < throttle1_min) {
+            throttle1_min = throttle1;
+        }
+        if (throttle2 > throttle2_max) {
+            throttle2_max = throttle2;
+        }
+        if (throttle2 < throttle2_min) {
+            throttle2_min = throttle2;    
+        }
+
+        if (brake > brake_max) {
+            brake_max = brake;
+        }
+        if (brake < brake_min) {
+            brake_min = brake;
+        }    
+
+         printf("throttle1: %d\r\n", throttle1);
+         printf("throttle1_max: %d\r\n", throttle1_max);
+         printf("throttle1_min: %d\r\n", throttle1_min); 
+         printf("throttle2: %d\r\n", throttle2);         
+         printf("throttle2_max: %d\r\n", throttle2_max);
+         printf("throttle2_min: %d\r\n", throttle2_min);
+         printf("brake: %d\r\n", brake);
+         printf("brake_max: %d\r\n", brake_max);
+         printf("brake_min: %d\r\n", brake_min);
+    }
+}
+
 // storage variables used to return to previous state when discrepancy is resolved
 state_t temp_state = LV; // state before sensor discrepancy error
 error_t temp_error = NONE; // error state before sensor discrepancy error (only used when going from one fault to discrepancy fault)
 
 void update_sensor_vals() {
-    // APPS1 = pin8 = RA0
-    //throttle1 = ADCC_GetSingleConversion(channel_ANB0);
-    // APPS2 = pin9 = RA1
-    //throttle2 = ADCC_GetSingleConversion(channel_ANB1);
-    // BSE1 = pin11 = RA3
-    // BSE2 = pin12 = RA4 
-    //brake = ADCC_GetSingleConversion(channel_ANB5);
+//     APPS1 = pin8 = RA0
+//    throttle1 = ADCC_GetSingleConversion(channel_ANB0);
+//     APPS2 = pin9 = RA1
+//    throttle2 = ADCC_GetSingleConversion(channel_ANB1);
+//     BSE1 = pin11 = RA3
+//     BSE2 = pin12 = RA4 
+//    brake = ADCC_GetSingleConversion(channel_ANB5);
     
      printf("State: %s\r\n", STATE_NAMES[state]);
      printf("Throttle 1: %d\r\n", throttle1);
@@ -391,6 +403,43 @@ void update_sensor_vals() {
    }
 }
 
+/************ CAN ************/
+
+typedef enum {
+    VEHICLE_STATE = 0x0c0,
+    TORQUE_REQUEST_COMMAND = 0x766,
+    BMS_TEMPERATURES = 0x389,
+    SWITCHES = 0x0d0
+} CAN_ID;
+
+CAN_MSG_OBJ msg_RX;
+
+void can_receive() {
+    // Debug only
+//    if(CAN1_ReceivedMessageCountGet() > 0) {
+//        switches = 101;
+//    }
+//    if (CAN1_Receive(&msg_RX)) {
+//        switches = 102;
+//    }
+    
+    // gets message and updates values
+    if (CAN1_Receive(&msg_RX)) {
+        switch (msg_RX.msgId) {
+            case SWITCHES:
+                switches |= msg_RX.data[0]; 
+                break;
+            case BMS_TEMPERATURES:
+                PACK_TEMP = msg_RX.data[7];
+                temp_attenuate();
+                break;
+            default:
+                // no valid input received
+                break;
+        }
+    } 
+}
+
 
 // TODO: write function to process and send pedal and brake data over CAN
 // see CY_ISR(isr_CAN_Handler) in pedal node
@@ -398,6 +447,7 @@ void update_sensor_vals() {
 // TODO: write functions to save and load calibration data
 // see EEPROM functions in pedal node
 // probably dont need this if we are always recalibrating on startup/lv
+
 
 /*
                          Main application
@@ -409,6 +459,16 @@ int main(void)
 
     // Set up ADCC for reading analog signals
     //ADCC_DischargeSampleCapacitor();
+    
+    // Set up CAN
+    CAN1_OperationModeSet(CAN_CONFIGURATION_MODE);
+    if(CAN_CONFIGURATION_MODE == CAN1_OperationModeGet()) {
+        if(CAN_OP_MODE_REQUEST_SUCCESS == CAN1_OperationModeSet(CAN_NORMAL_2_0_MODE)) {
+            // set up successful
+            // blink lights here
+            // (tested and worked)
+        }
+    }
 
     // Only for debugging. Use this to test the controls on the breadboard
     #if 0
@@ -436,16 +496,43 @@ int main(void)
         
         // CAN receive
         can_receive();
-        
-        // CAN transmit state and throttle values
+       
+        // CAN transmit state
         CAN_MSG_OBJ msg_TX_state;
-        msg_TX_state.msgId = 0x01;
-        uint8_t data_TX_state[1] = {state, throttle1, throttle2}; // state is 1 byte, throttle1 and throttle2 are ints
+        
+        CAN_MSG_FIELD field_TX_state; 
+        field_TX_state.dlc = 3; 
+        field_TX_state.idType = 0;
+        field_TX_state.formatType = 0; 
+        field_TX_state.frameType = 0; 
+        field_TX_state.brs = 0; 
+        
+        uint8_t data_TX_state[1] = {state}; 
         if (state == FAULT) { 
             data_TX_state[0] = 0b10000000 + error; // greatest bit = 1 if fault 
         }
+        
+        msg_TX_state.field = field_TX_state; 
         msg_TX_state.data = data_TX_state;
+        msg_TX_state.msgId = VEHICLE_STATE;
         CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_state);
+        
+        
+        // CAN transmit switch (only for debugging)
+//        CAN_MSG_OBJ msg_TX_switch;
+//        CAN_MSG_FIELD field_TX_switch; 
+//
+//        field_TX_switch.dlc = 1; 
+//        field_TX_switch.idType = 0;
+//        field_TX_switch.formatType = 0; 
+//        field_TX_switch.frameType = 0; 
+//        field_TX_switch.brs = 0; 
+//        
+//        msg_TX_switch.field = field_TX_switch; 
+//        msg_TX_switch.msgId = SWITCHES;
+//        uint8_t data_TX_switch[1] = {switches}; 
+//        msg_TX_switch.data = data_TX_switch;
+//        CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_switch);
         
 
         switch (state) {
@@ -516,18 +603,29 @@ int main(void)
             case DRIVE:
                 update_sensor_vals();
                 
-                // Torque Request Command
-//                CAN_MSG_OBJ msg_TX_torque;
-//                msg_TX_torque.msgId = 0x02;
-//                uint8_t data_TX_throttle[1] = {0};
-//                if (is_hv_requested()) data_TX_throttle[1] &= (0b1 << 0);
-//                if (/*torque command upper*/) data_TX_throttle[1] &= (0b1 << 1);
-//                if (/*torque command lower*/) data_TX_throttle[1] &= (0b1 << 2);
-//                if (/*SOC*/) data_TX_throttle[1] &= (0b1 << 6);
-//                if (/*max BMS temp*/) data_TX_throttle[1] &= (0b1 << 7);
-//                msg_TX_torque.data = data_TX_torque;
-//                CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_torque);
+                //  CAN transmit torque request command 
+                CAN_MSG_OBJ msg_TX_torque;
+                
+                CAN_MSG_FIELD field_TX_torque; 
+                field_TX_torque.dlc = 5; 
+                field_TX_torque.idType = 0;
+                field_TX_torque.formatType = 0; 
+                field_TX_torque.frameType = 0; 
+                field_TX_torque.brs = 0;
+                
+                uint8_t data_TX_torque[3] = {
+                    is_hv_requested(), 
+                    (uint16_t)(throttle1 * THROTTLE_MULTIPLIER) >> 8, // torque request upper
+                    (uint16_t)(throttle1 * THROTTLE_MULTIPLIER) & 0b11111111 // torque request lower
+                };
+                
+                msg_TX_torque.field = field_TX_torque; 
+                msg_TX_torque.msgId = TORQUE_REQUEST_COMMAND;
+                msg_TX_torque.data = data_TX_torque;
+                
+                CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_torque);
         
+              
 
                 if (!is_drive_requested()) {
                     // Drive switch was flipped off
@@ -582,7 +680,7 @@ int main(void)
                         
                         // stop power to motors if discrepancy persists for >100ms
                         // see rule T.4.2.5 in FSAE 2022 rulebook
-                        if (discrepancy_timer_ms > MAX_DISCREPANCY_TIME) {
+                        if (discrepancy_timer_ms > MAX_DISCREPANCY_MS) {
                             change_state(LV);
                         }
 
