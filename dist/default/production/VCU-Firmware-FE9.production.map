@@ -210,14 +210,14 @@ section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
 .text                        0x200              0x19e2          0x26d3  (9939)
 .const                      0x1be2               0x1ee           0x2e5  (741)
-.text                       0x1dd0              0x13d0          0x1db8  (7608)
-.dinit                      0x31a0                0xb2           0x10b  (267)
-.text                       0x3252               0x166           0x219  (537)
-.init.delay32               0x33b8                0x1c            0x2a  (42)
-.text                       0x33d4                0x18            0x24  (36)
-data_init_dualch.S.scn1     0x33ec                 0x2             0x3  (3)
+.text                       0x1dd0              0x13cc          0x1db2  (7602)
+.dinit                      0x319c                0xb2           0x10b  (267)
+.text                       0x324e               0x166           0x219  (537)
+.init.delay32               0x33b4                0x1c            0x2a  (42)
+.text                       0x33d0                0x18            0x24  (36)
+data_init_dualch.S.scn1     0x33e8                 0x2             0x3  (3)
 
-                 Total "program" memory used (bytes):         0x4ae5  (19173) 7%
+                 Total "program" memory used (bytes):         0x4adf  (19167) 7%
 
 
 "data" Memory  [Origin = 0x1000, Length = 0x8000]
@@ -432,50 +432,50 @@ External Symbols in Program Memory (by address):
                   0x0028e0                  _run_calibration
                   0x0029b6                  _update_sensor_vals
                   0x002a0c                  _can_receive
-                  0x002a84                  _main
-                  0x002d0c                  _ADC1_Initialize
-                  0x002dc2                  _ADC1_SharedCorePowerEnable
-                  0x002dde                  _ADC1_SetCommonInterruptHandler
-                  0x002e0e                  _ADC1_Setchannel_AN16InterruptHandler
-                  0x002e22                  _ADC1_Setchannel_AN17InterruptHandler
-                  0x002e36                  _ADC1_Setchannel_AN18InterruptHandler
-                  0x002e4a                  _ADC1_Setchannel_AN19InterruptHandler
-                  0x002e5e                  _ADC1_Setchannel_AN20InterruptHandler
-                  0x002e6a                  _RESET_GetCause
-                  0x002f8e                  _RESET_CauseClearAll
-                  0x002fa4                  _CAN2_Initialize
-                  0x002fc6                  _CAN2_OperationModeSet
-                  0x00302e                  _CAN2_OperationModeGet
-                  0x00303c                  _CAN2_IsBusOff
-                  0x003054                  _CAN2_Sleep
-                  0x003082                  _CAN2_Tasks
-                  0x0030be                  _UART1_Initialize
-                  0x0030ee                  _UART1_Read
-                  0x00310c                  _UART1_Write
-                  0x003122                  _UART1_IsRxReady
-                  0x003136                  _UART1_IsTxReady
-                  0x003156                  _UART1_IsTxDone
-                  0x00316e                  _UART1_StatusGet
-                  0x003188                  _UART1_Enable
-                  0x003194                  _UART1_Disable
-                  0x003252                  _PIN_MANAGER_Initialize
-                  0x0032da                  _CLOCK_Initialize
-                  0x003330                  _CLOCK_AuxPllLockStatusGet
-                  0x003366                  _SYSTEM_Initialize
-                  0x003380                  _INTERRUPT_Initialize
-                  0x0033b8                  ___delay32
+                  0x002a80                  _main
+                  0x002d08                  _ADC1_Initialize
+                  0x002dbe                  _ADC1_SharedCorePowerEnable
+                  0x002dda                  _ADC1_SetCommonInterruptHandler
+                  0x002e0a                  _ADC1_Setchannel_AN16InterruptHandler
+                  0x002e1e                  _ADC1_Setchannel_AN17InterruptHandler
+                  0x002e32                  _ADC1_Setchannel_AN18InterruptHandler
+                  0x002e46                  _ADC1_Setchannel_AN19InterruptHandler
+                  0x002e5a                  _ADC1_Setchannel_AN20InterruptHandler
+                  0x002e66                  _RESET_GetCause
+                  0x002f8a                  _RESET_CauseClearAll
+                  0x002fa0                  _CAN2_Initialize
+                  0x002fc2                  _CAN2_OperationModeSet
+                  0x00302a                  _CAN2_OperationModeGet
+                  0x003038                  _CAN2_IsBusOff
+                  0x003050                  _CAN2_Sleep
+                  0x00307e                  _CAN2_Tasks
+                  0x0030ba                  _UART1_Initialize
+                  0x0030ea                  _UART1_Read
+                  0x003108                  _UART1_Write
+                  0x00311e                  _UART1_IsRxReady
+                  0x003132                  _UART1_IsTxReady
+                  0x003152                  _UART1_IsTxDone
+                  0x00316a                  _UART1_StatusGet
+                  0x003184                  _UART1_Enable
+                  0x003190                  _UART1_Disable
+                  0x00324e                  _PIN_MANAGER_Initialize
+                  0x0032d6                  _CLOCK_Initialize
+                  0x00332c                  _CLOCK_AuxPllLockStatusGet
+                  0x003362                  _SYSTEM_Initialize
+                  0x00337c                  _INTERRUPT_Initialize
+                  0x0033b4                  ___delay32
                   0x02bf00                  __FSEC.sec
 
 External Symbols in Program Memory (by name):
 
-                  0x002d0c                  _ADC1_Initialize
-                  0x002dde                  _ADC1_SetCommonInterruptHandler
-                  0x002e0e                  _ADC1_Setchannel_AN16InterruptHandler
-                  0x002e22                  _ADC1_Setchannel_AN17InterruptHandler
-                  0x002e36                  _ADC1_Setchannel_AN18InterruptHandler
-                  0x002e4a                  _ADC1_Setchannel_AN19InterruptHandler
-                  0x002e5e                  _ADC1_Setchannel_AN20InterruptHandler
-                  0x002dc2                  _ADC1_SharedCorePowerEnable
+                  0x002d08                  _ADC1_Initialize
+                  0x002dda                  _ADC1_SetCommonInterruptHandler
+                  0x002e0a                  _ADC1_Setchannel_AN16InterruptHandler
+                  0x002e1e                  _ADC1_Setchannel_AN17InterruptHandler
+                  0x002e32                  _ADC1_Setchannel_AN18InterruptHandler
+                  0x002e46                  _ADC1_Setchannel_AN19InterruptHandler
+                  0x002e5a                  _ADC1_Setchannel_AN20InterruptHandler
+                  0x002dbe                  _ADC1_SharedCorePowerEnable
                   0x002244                  _CAN1_Initialize
                   0x002564                  _CAN1_IsBusOff
                   0x0025ac                  _CAN1_IsRxErrorActive
@@ -492,29 +492,29 @@ External Symbols in Program Memory (by name):
                   0x00264e                  _CAN1_Tasks
                   0x0023ae                  _CAN1_Transmit
                   0x002448                  _CAN1_TransmitFIFOStatusGet
-                  0x002fa4                  _CAN2_Initialize
-                  0x00303c                  _CAN2_IsBusOff
-                  0x00302e                  _CAN2_OperationModeGet
-                  0x002fc6                  _CAN2_OperationModeSet
-                  0x003054                  _CAN2_Sleep
-                  0x003082                  _CAN2_Tasks
-                  0x003330                  _CLOCK_AuxPllLockStatusGet
-                  0x0032da                  _CLOCK_Initialize
-                  0x003380                  _INTERRUPT_Initialize
-                  0x003252                  _PIN_MANAGER_Initialize
-                  0x002f8e                  _RESET_CauseClearAll
-                  0x002e6a                  _RESET_GetCause
-                  0x003366                  _SYSTEM_Initialize
+                  0x002fa0                  _CAN2_Initialize
+                  0x003038                  _CAN2_IsBusOff
+                  0x00302a                  _CAN2_OperationModeGet
+                  0x002fc2                  _CAN2_OperationModeSet
+                  0x003050                  _CAN2_Sleep
+                  0x00307e                  _CAN2_Tasks
+                  0x00332c                  _CLOCK_AuxPllLockStatusGet
+                  0x0032d6                  _CLOCK_Initialize
+                  0x00337c                  _INTERRUPT_Initialize
+                  0x00324e                  _PIN_MANAGER_Initialize
+                  0x002f8a                  _RESET_CauseClearAll
+                  0x002e66                  _RESET_GetCause
+                  0x003362                  _SYSTEM_Initialize
                   0x001ca2                  _THROTTLE_MAP
-                  0x003194                  _UART1_Disable
-                  0x003188                  _UART1_Enable
-                  0x0030be                  _UART1_Initialize
-                  0x003122                  _UART1_IsRxReady
-                  0x003156                  _UART1_IsTxDone
-                  0x003136                  _UART1_IsTxReady
-                  0x0030ee                  _UART1_Read
-                  0x00316e                  _UART1_StatusGet
-                  0x00310c                  _UART1_Write
+                  0x003190                  _UART1_Disable
+                  0x003184                  _UART1_Enable
+                  0x0030ba                  _UART1_Initialize
+                  0x00311e                  _UART1_IsRxReady
+                  0x003152                  _UART1_IsTxDone
+                  0x003132                  _UART1_IsTxReady
+                  0x0030ea                  _UART1_Read
+                  0x00316a                  _UART1_StatusGet
+                  0x003108                  _UART1_Write
                   0x0003fc                  __AddressError
                   0x0004d0                  __C1Interrupt
                   0x0004a6                  __C2Interrupt
@@ -526,7 +526,7 @@ External Symbols in Program Memory (by name):
                   0x00045c                  __SoftTrapError
                   0x0003da                  __StackError
                   0x001144                  ___cvt_u
-                  0x0033b8                  ___delay32
+                  0x0033b4                  ___delay32
                   0x001b26                  ___divdi3
                   0x000758                  ___divsf3
                   0x000758                  ___divsf3x
@@ -603,7 +603,7 @@ External Symbols in Program Memory (by name):
                   0x002762                  _has_discrepancy
                   0x00270a                  _is_drive_requested
                   0x002700                  _is_hv_requested
-                  0x002a84                  _main
+                  0x002a80                  _main
                   0x000d16                  _memcpy
                   0x000d24                  _memset
                   0x000f82                  _putc
@@ -5132,7 +5132,7 @@ _0x108131d2062847d7e
                     0x9ca2                  _THROTTLE_MAP
  .const             0x9dc6          0xa build/default/production/mcc_generated_files/can1.o
 
-.text             0x001dd0       0x13d0
+.text             0x001dd0       0x13cc
  .text            0x001dd0        0x8d2 build/default/production/mcc_generated_files/can1.o
                   0x002244                  _CAN1_Initialize
                   0x002272                  _CAN1_OperationModeSet
@@ -5157,7 +5157,7 @@ _0x108131d2062847d7e
                   0x002642                  _CAN1_DefaultTxAttemptHandler
                   0x002648                  _CAN1_DefaultRxBufferOverFlowHandler
                   0x00264e                  _CAN1_Tasks
- .text            0x0026a2        0x66a build/default/production/main.o
+ .text            0x0026a2        0x666 build/default/production/main.o
                   0x0026a2                  _change_state
                   0x0026dc                  _report_fault
                   0x002700                  _is_hv_requested
@@ -5168,73 +5168,73 @@ _0x108131d2062847d7e
                   0x0028e0                  _run_calibration
                   0x0029b6                  _update_sensor_vals
                   0x002a0c                  _can_receive
-                  0x002a84                  _main
- .text            0x002d0c        0x15e build/default/production/mcc_generated_files/adc1.o
-                  0x002d0c                  _ADC1_Initialize
-                  0x002dc2                  _ADC1_SharedCorePowerEnable
-                  0x002dd8                  _ADC1_CallBack
-                  0x002dde                  _ADC1_SetCommonInterruptHandler
-                  0x002dea                  _ADC1_Tasks
-                  0x002e06                  _ADC1_channel_AN16_CallBack
-                  0x002e0e                  _ADC1_Setchannel_AN16InterruptHandler
-                  0x002e1a                  _ADC1_channel_AN17_CallBack
-                  0x002e22                  _ADC1_Setchannel_AN17InterruptHandler
-                  0x002e2e                  _ADC1_channel_AN18_CallBack
-                  0x002e36                  _ADC1_Setchannel_AN18InterruptHandler
-                  0x002e42                  _ADC1_channel_AN19_CallBack
-                  0x002e4a                  _ADC1_Setchannel_AN19InterruptHandler
-                  0x002e56                  _ADC1_channel_AN20_CallBack
-                  0x002e5e                  _ADC1_Setchannel_AN20InterruptHandler
- .text            0x002e6a        0x12c build/default/production/mcc_generated_files/reset.o
-                  0x002e6a                  _RESET_GetCause
-                  0x002e72                  _RESET_CauseHandler
-                  0x002f8e                  _RESET_CauseClearAll
- .text            0x002f96        0x128 build/default/production/mcc_generated_files/can2.o
-                  0x002fa4                  _CAN2_Initialize
-                  0x002fc6                  _CAN2_OperationModeSet
-                  0x00302e                  _CAN2_OperationModeGet
-                  0x00303c                  _CAN2_IsBusOff
-                  0x003054                  _CAN2_Sleep
-                  0x003064                  _CAN2_DefaultInvalidMessageHandler
-                  0x00306a                  _CAN2_DefaultBusWakeUpActivityHandler
-                  0x003070                  _CAN2_DefaultBusErrorHandler
-                  0x003076                  _CAN2_DefaultModeChangeHandler
-                  0x00307c                  _CAN2_DefaultSystemErrorHandler
-                  0x003082                  _CAN2_Tasks
- .text            0x0030be         0xe2 build/default/production/mcc_generated_files/uart1.o
-                  0x0030be                  _UART1_Initialize
-                  0x0030ee                  _UART1_Read
-                  0x00310c                  _UART1_Write
-                  0x003122                  _UART1_IsRxReady
-                  0x003136                  _UART1_IsTxReady
-                  0x003156                  _UART1_IsTxDone
-                  0x00316e                  _UART1_StatusGet
-                  0x003188                  _UART1_Enable
-                  0x003194                  _UART1_Disable
+                  0x002a80                  _main
+ .text            0x002d08        0x15e build/default/production/mcc_generated_files/adc1.o
+                  0x002d08                  _ADC1_Initialize
+                  0x002dbe                  _ADC1_SharedCorePowerEnable
+                  0x002dd4                  _ADC1_CallBack
+                  0x002dda                  _ADC1_SetCommonInterruptHandler
+                  0x002de6                  _ADC1_Tasks
+                  0x002e02                  _ADC1_channel_AN16_CallBack
+                  0x002e0a                  _ADC1_Setchannel_AN16InterruptHandler
+                  0x002e16                  _ADC1_channel_AN17_CallBack
+                  0x002e1e                  _ADC1_Setchannel_AN17InterruptHandler
+                  0x002e2a                  _ADC1_channel_AN18_CallBack
+                  0x002e32                  _ADC1_Setchannel_AN18InterruptHandler
+                  0x002e3e                  _ADC1_channel_AN19_CallBack
+                  0x002e46                  _ADC1_Setchannel_AN19InterruptHandler
+                  0x002e52                  _ADC1_channel_AN20_CallBack
+                  0x002e5a                  _ADC1_Setchannel_AN20InterruptHandler
+ .text            0x002e66        0x12c build/default/production/mcc_generated_files/reset.o
+                  0x002e66                  _RESET_GetCause
+                  0x002e6e                  _RESET_CauseHandler
+                  0x002f8a                  _RESET_CauseClearAll
+ .text            0x002f92        0x128 build/default/production/mcc_generated_files/can2.o
+                  0x002fa0                  _CAN2_Initialize
+                  0x002fc2                  _CAN2_OperationModeSet
+                  0x00302a                  _CAN2_OperationModeGet
+                  0x003038                  _CAN2_IsBusOff
+                  0x003050                  _CAN2_Sleep
+                  0x003060                  _CAN2_DefaultInvalidMessageHandler
+                  0x003066                  _CAN2_DefaultBusWakeUpActivityHandler
+                  0x00306c                  _CAN2_DefaultBusErrorHandler
+                  0x003072                  _CAN2_DefaultModeChangeHandler
+                  0x003078                  _CAN2_DefaultSystemErrorHandler
+                  0x00307e                  _CAN2_Tasks
+ .text            0x0030ba         0xe2 build/default/production/mcc_generated_files/uart1.o
+                  0x0030ba                  _UART1_Initialize
+                  0x0030ea                  _UART1_Read
+                  0x003108                  _UART1_Write
+                  0x00311e                  _UART1_IsRxReady
+                  0x003132                  _UART1_IsTxReady
+                  0x003152                  _UART1_IsTxDone
+                  0x00316a                  _UART1_StatusGet
+                  0x003184                  _UART1_Enable
+                  0x003190                  _UART1_Disable
 
-.dinit            0x0031a0         0xb2
- .dinit           0x0031a0         0xb2 data_init
+.dinit            0x00319c         0xb2
+ .dinit           0x00319c         0xb2 data_init
 
-.text             0x003252        0x166
- .text            0x003252         0x88 build/default/production/mcc_generated_files/pin_manager.o
-                  0x003252                  _PIN_MANAGER_Initialize
- .text            0x0032da         0x6e build/default/production/mcc_generated_files/clock.o
-                  0x0032da                  _CLOCK_Initialize
-                  0x003330                  _CLOCK_AuxPllLockStatusGet
- .text            0x003348         0x38 build/default/production/mcc_generated_files/system.o
-                  0x003366                  _SYSTEM_Initialize
- .text            0x003380         0x38 build/default/production/mcc_generated_files/interrupt_manager.o
-                  0x003380                  _INTERRUPT_Initialize
+.text             0x00324e        0x166
+ .text            0x00324e         0x88 build/default/production/mcc_generated_files/pin_manager.o
+                  0x00324e                  _PIN_MANAGER_Initialize
+ .text            0x0032d6         0x6e build/default/production/mcc_generated_files/clock.o
+                  0x0032d6                  _CLOCK_Initialize
+                  0x00332c                  _CLOCK_AuxPllLockStatusGet
+ .text            0x003344         0x38 build/default/production/mcc_generated_files/system.o
+                  0x003362                  _SYSTEM_Initialize
+ .text            0x00337c         0x38 build/default/production/mcc_generated_files/interrupt_manager.o
+                  0x00337c                  _INTERRUPT_Initialize
 
-.init.delay32     0x0033b8         0x1c
- .init.delay32    0x0033b8         0x1c /Applications/microchip/xc16/v2.00/bin/bin/../../lib/libc99-pic30-elf.a(delay32ch.Meo)
-                  0x0033b8                  ___delay32
+.init.delay32     0x0033b4         0x1c
+ .init.delay32    0x0033b4         0x1c /Applications/microchip/xc16/v2.00/bin/bin/../../lib/libc99-pic30-elf.a(delay32ch.Meo)
+                  0x0033b4                  ___delay32
 
-.text             0x0033d4         0x18
- .text            0x0033d4         0x18 build/default/production/mcc_generated_files/traps.o
-                  0x0033d4                  _TRAPS_halt_on_error
+.text             0x0033d0         0x18
+ .text            0x0033d0         0x18 build/default/production/mcc_generated_files/traps.o
+                  0x0033d0                  _TRAPS_halt_on_error
 
 data_init_dualch.S.scn1
-                  0x0033ec          0x2
+                  0x0033e8          0x2
  data_init_dualch.S.scn1
-                  0x0033ec          0x2 /Applications/microchip/xc16/v2.00/bin/bin/../../lib/libc99-pic30-elf.a(data_init_dualch.o)
+                  0x0033e8          0x2 /Applications/microchip/xc16/v2.00/bin/bin/../../lib/libc99-pic30-elf.a(data_init_dualch.o)

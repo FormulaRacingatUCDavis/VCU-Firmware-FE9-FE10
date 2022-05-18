@@ -429,7 +429,7 @@ void can_receive() {
         switch (msg_RX.msgId) {
             case SWITCHES:
                 INDICATOR_2_Toggle();
-                switches |= msg_RX.data[0]; 
+                switches = msg_RX.data[0]; 
                 break;
             case BMS_TEMPERATURES:
                 PACK_TEMP = msg_RX.data[7];
