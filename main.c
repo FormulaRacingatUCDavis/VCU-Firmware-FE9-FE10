@@ -425,8 +425,10 @@ void can_receive() {
     
     // gets message and updates values
     if (CAN1_Receive(&msg_RX)) {
+        INDICATOR_1_Toggle();
         switch (msg_RX.msgId) {
             case SWITCHES:
+                INDICATOR_2_Toggle();
                 switches |= msg_RX.data[0]; 
                 break;
             case BMS_TEMPERATURES:

@@ -71,7 +71,7 @@ void PIN_MANAGER_Initialize (void)
      ***************************************************************************/
     TRISA = 0x001F;
     TRISB = 0xFEBD;
-    TRISC = 0x3EFF;
+    TRISC = 0x3ECF;
     TRISD = 0x2502;
 
     /****************************************************************************
@@ -107,12 +107,12 @@ void PIN_MANAGER_Initialize (void)
      ***************************************************************************/
     __builtin_write_RPCON(0x0000); // unlock PPS
 
-    RPINR26bits.CAN1RXR = 0x0025;    //RB5->CAN FD1 MODULE:CAN1RX
+    RPOR3bits.RP38R = 0x0015;    //RB6->CAN FD1 MODULE:CAN1TX
     RPOR12bits.RP56R = 0x0001;    //RC8->UART1:U1TX
     RPINR18bits.U1RXR = 0x0039;    //RC9->UART1:U1RX
     RPINR26bits.CAN2RXR = 0x0027;    //RB7->CAN FD2 MODULE:CAN2RX
-    RPOR3bits.RP38R = 0x0015;    //RB6->CAN FD1 MODULE:CAN1TX
     RPOR4bits.RP40R = 0x0016;    //RB8->CAN FD2 MODULE:CAN2TX
+    RPINR26bits.CAN1RXR = 0x0025;    //RB5->CAN FD1 MODULE:CAN1RX
 
     __builtin_write_RPCON(0x0800); // lock PPS
 }
