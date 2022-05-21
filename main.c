@@ -121,7 +121,8 @@ typedef enum {
     BRAKE_NOT_PRESSED,
     HV_DISABLED_WHILE_DRIVING,
     SENSOR_DISCREPANCY,
-    BRAKE_IMPLAUSIBLE
+    BRAKE_IMPLAUSIBLE,
+    ESTOP
 } error_t;
 
 // Initial FSM state
@@ -403,13 +404,21 @@ void update_sensor_vals() {
    }
 }
 
+/************ Capacitor ************/
+
+uint16_t capacitor_volt = 0;
+#define PRECHARGE_THRESHOLD 5806 // 90% of accumulator voltage, scaled from range of 0-12800(0V-200V)
+
 /************ CAN ************/
 
 typedef enum {
     VEHICLE_STATE = 0x0c0,
     TORQUE_REQUEST_COMMAND = 0x766,
     BMS_TEMPERATURES = 0x389,
-    SWITCHES = 0x0d0
+    SWITCHES = 0x0d0,
+    MOTOR_CONTROLLER_ESTOP = 0x366,
+    MOTOR_CONTROLLER_PDOSEND = 0x566,
+    BRAKE_COMMAND = 0x767
 } CAN_ID;
 
 CAN_MSG_OBJ msg_RX;
@@ -428,13 +437,20 @@ void can_receive() {
         INDICATOR_1_Toggle();
         switch (msg_RX.msgId) {
             case SWITCHES:
-                INDICATOR_2_Toggle();
                 switches = msg_RX.data[0]; 
                 break;
             case BMS_TEMPERATURES:
                 PACK_TEMP = msg_RX.data[7];
                 temp_attenuate();
                 break;
+            case MOTOR_CONTROLLER_ESTOP:
+                INDICATOR_2_Toggle();
+                if (msg_RX.data[0]) { // if estop detected in any state
+                    report_fault(ESTOP);
+                }
+            case MOTOR_CONTROLLER_PDOSEND:
+                capacitor_volt = (msg_RX.data[0] << 8); // upper bits
+                capacitor_volt += msg_RX.data[1]; // lower bits
             default:
                 // no valid input received
                 break;
@@ -503,7 +519,7 @@ int main(void)
         CAN_MSG_OBJ msg_TX_state;
         
         CAN_MSG_FIELD field_TX_state; 
-        field_TX_state.dlc = 3; 
+        field_TX_state.dlc = 1; 
         field_TX_state.idType = 0;
         field_TX_state.formatType = 0; 
         field_TX_state.frameType = 0; 
@@ -518,6 +534,24 @@ int main(void)
         msg_TX_state.data = data_TX_state;
         msg_TX_state.msgId = VEHICLE_STATE;
         CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_state);
+        
+        
+        // CAN transmit brake command
+        CAN_MSG_OBJ msg_TX_brake;
+        
+        CAN_MSG_FIELD field_TX_brake; 
+        field_TX_brake.dlc = 1; 
+        field_TX_brake.idType = 0;
+        field_TX_brake.formatType = 0; 
+        field_TX_brake.frameType = 0; 
+        field_TX_brake.brs = 0; 
+        
+        uint8_t data_TX_brake[1] = {brake}; 
+        
+        msg_TX_brake.field = field_TX_state; 
+        msg_TX_brake.data = data_TX_state;
+        msg_TX_brake.msgId = BRAKE_COMMAND;
+        CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_brake);
         
         
         // CAN transmit switch (only for debugging)
@@ -566,10 +600,8 @@ int main(void)
                     break;
                 }
                      
-                // TODO: get signal from motor controller
-                // that capacitor volts exceeded threshold
-                if (1) {
-                    // Finished charging to HV in timely manner
+                if (capacitor_volt > PRECHARGE_THRESHOLD) {
+                    // Finished charging to HV on time
                     change_state(HV_ENABLED);
                     break;
                 }
@@ -593,7 +625,6 @@ int main(void)
                     // Driver flipped on drive switch
                     // Need to press on pedal at the same time to go to drive
                     if (brake >= PEDAL_MAX - BRAKE_ERROR_TOLERANCE) {
-
                         change_state(DRIVE);                        
                     } else {
                         // Driver didn't press pedal
@@ -704,6 +735,10 @@ int main(void)
 
                         if (!brake_implausible()) {
                             change_state(DRIVE);
+                        }
+                    case ESTOP:
+                        if (!is_hv_requested() && !is_drive_requested()) {
+                            change_state(LV);
                         }
                 }
                 break;
