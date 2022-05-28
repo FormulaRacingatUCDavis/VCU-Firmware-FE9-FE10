@@ -173,7 +173,7 @@ void report_fault(error_t _error) {
 // Keeps track of timer waiting for pre-charging
 unsigned int conservative_timer_ms = 0;
 // Delay between checking pre-charging state
-#define AWAIT_PRECHARGING_DELAY_MS 100
+#define AWAIT_PRECHARGING_DELAY_MS 10
 
 // High voltage state variables
 #define DRIVE_REQ_DELAY_MS 1000
@@ -193,12 +193,10 @@ unsigned int conservative_timer_ms = 0;
  */
 volatile uint8_t switches = 0;
 
-// TODO: may remove; was for pin, now uses global var
 uint8_t is_hv_requested() {
     return switches & 0b10;//IO_RB2_GetValue();
 }
 
-// TODO: may remove; was for pin, now uses global var
 uint8_t is_drive_requested() {
     return switches & 0b1;//IO_RB7_GetValue();
 }
@@ -458,15 +456,6 @@ void can_receive() {
     } 
 }
 
-
-// TODO: write function to process and send pedal and brake data over CAN
-// see CY_ISR(isr_CAN_Handler) in pedal node
-
-// TODO: write functions to save and load calibration data
-// see EEPROM functions in pedal node
-// probably dont need this if we are always recalibrating on startup/lv
-
-
 /*
                          Main application
  */
@@ -502,9 +491,6 @@ int main(void)
     #endif
     
     printf("Starting in %s state", STATE_NAMES[state]);
-    
-    // TODO: set throttle and brake mins/maxs to opposite of range
-    // see calibrating state in main() in pedal node
     
     while (1) {
         // Main FSM
@@ -606,7 +592,6 @@ int main(void)
                     break;
                 }
                 
-                // TODO: check using clock cycles or system clock instead
                 // Check if pre-charge is finished for every delay
                 __delay_ms(AWAIT_PRECHARGING_DELAY_MS);
                 conservative_timer_ms += AWAIT_PRECHARGING_DELAY_MS;
@@ -614,9 +599,8 @@ int main(void)
             case HV_ENABLED:
                 update_sensor_vals();
 
-                if (!is_hv_requested()) {
+                if (!is_hv_requested() || capacitor_volt < PRECHARGE_THRESHOLD) {
                     // Driver flipped off HV switch
-                    // TODO: or capacitor voltage went under threshold
                     change_state(LV);
                     break;
                 }
@@ -714,10 +698,12 @@ int main(void)
                         // stop power to motors if discrepancy persists for >100ms
                         // see rule T.4.2.5 in FSAE 2022 rulebook
                         if (discrepancy_timer_ms > MAX_DISCREPANCY_MS) {
+                            discrepancy_timer_ms = 0;
                             change_state(LV);
                         }
 
                         if (!has_discrepancy()) {
+                            discrepancy_timer_ms = 0;
                             // if discrepancy resolved, change back to previous state
                             if (temp_state == FAULT) {
                                 report_fault(temp_error);
@@ -727,7 +713,6 @@ int main(void)
                         }
                         __delay_ms(AWAIT_DISCREPANCY_DELAY_MS);
                         discrepancy_timer_ms += AWAIT_DISCREPANCY_DELAY_MS;
-                        // TODO: reset discrepancy timer after error resolved
                         
                         break;
                     case BRAKE_IMPLAUSIBLE:
