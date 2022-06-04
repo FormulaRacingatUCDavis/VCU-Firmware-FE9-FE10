@@ -169,7 +169,7 @@ void report_fault(error_t _error) {
 }
 
 // How long to wait for pre-charging to finish before timing out
-#define MAX_CONSERVATION_SECS 4
+#define MAX_CONSERVATION_SECS 5
 // Keeps track of timer waiting for pre-charging
 unsigned int conservative_timer_ms = 0;
 // Delay between checking pre-charging state
@@ -304,19 +304,19 @@ bool brake_implausible() {
     
 }
 
-//uint16_t getConversion(ADC1_CHANNEL channel){
-//    uint16_t conversion;
-//    ADC1_Enable();
-//    ADC1_ChannelSelect(channel);
-//    ADC1_SoftwareTriggerEnable();
-//    //Provide Delay
-//    __delay_ms(1);
-//    ADC1_SoftwareTriggerDisable();
-//    while(!ADC1_IsConversionComplete(channel));
-//    conversion = ADC1_ConversionResultGet(channel);
-//    ADC1_Disable();
-//    return conversion;
-//}
+uint16_t getConversion(ADC1_CHANNEL channel){
+    uint16_t conversion;
+    ADC1_Enable();
+    ADC1_ChannelSelect(channel);
+    ADC1_SoftwareTriggerEnable();
+    //Provide Delay
+    __delay_ms(1);
+    ADC1_SoftwareTriggerDisable();
+    while(!ADC1_IsConversionComplete(channel));
+    conversion = ADC1_ConversionResultGet(channel);
+    ADC1_Disable();
+    return conversion;
+}
 
 
 // Update sensors
@@ -338,12 +338,12 @@ void run_calibration() {
     }
     else {
         // APPS1 = pin8 = RA0
-        //throttle1 = ADCC_GetSingleConversion(channel_ANB0);
+        throttle1 = getConversion(APPS1);
         // APPS2 = pin9 = RA1
-        //throttle2 = ADCC_GetSingleConversion(channel_ANB1);
+        throttle2 = getConversion(APPS2);
         // BSE1 = pin11 = RA3
         // BSE2 = pin12 = RA4
-        //brake = ADCC_GetSingleConversion(channel_ANB5);
+        brake = getConversion(BSE1);
 
         if (throttle1 > throttle1_max) {
             throttle1_max = throttle1;
@@ -382,13 +382,13 @@ state_t temp_state = LV; // state before sensor discrepancy error
 error_t temp_error = NONE; // error state before sensor discrepancy error (only used when going from one fault to discrepancy fault)
 
 void update_sensor_vals() {
-//     APPS1 = pin8 = RA0
-//    throttle1 = ADCC_GetSingleConversion(channel_ANB0);
-//     APPS2 = pin9 = RA1
-//    throttle2 = ADCC_GetSingleConversion(channel_ANB1);
-//     BSE1 = pin11 = RA3
-//     BSE2 = pin12 = RA4 
-//    brake = ADCC_GetSingleConversion(channel_ANB5);
+    // APPS1 = pin8 = RA0
+    throttle1 = getConversion(APPS1);
+    // APPS2 = pin9 = RA1
+    throttle2 = getConversion(APPS2);
+    // BSE1 = pin11 = RA3
+    // BSE2 = pin12 = RA4
+    brake = getConversion(BSE1);
     
      printf("State: %s\r\n", STATE_NAMES[state]);
      printf("Throttle 1: %d\r\n", throttle1);
@@ -422,14 +422,6 @@ typedef enum {
 CAN_MSG_OBJ msg_RX;
 
 void can_receive() {
-    // Debug only
-//    if(CAN1_ReceivedMessageCountGet() > 0) {
-//        switches = 101;
-//    }
-//    if (CAN1_Receive(&msg_RX)) {
-//        switches = 102;
-//    }
-    
     // gets message and updates values
     if (CAN1_Receive(&msg_RX)) {
         INDICATOR_1_Toggle();
@@ -540,6 +532,29 @@ int main(void)
         CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_brake);
         
         
+        //  CAN transmit torque request command 
+        CAN_MSG_OBJ msg_TX_torque;
+
+        CAN_MSG_FIELD field_TX_torque; 
+        field_TX_torque.dlc = 5; 
+        field_TX_torque.idType = 0;
+        field_TX_torque.formatType = 0; 
+        field_TX_torque.frameType = 0; 
+        field_TX_torque.brs = 0;
+
+        uint8_t data_TX_torque[3] = {
+            is_hv_requested(), 
+            (uint16_t)(throttle1 * THROTTLE_MULTIPLIER) >> 8, // torque request upper
+            (uint16_t)(throttle1 * THROTTLE_MULTIPLIER) & 0b11111111 // torque request lower
+        };
+
+        msg_TX_torque.field = field_TX_torque; 
+        msg_TX_torque.msgId = TORQUE_REQUEST_COMMAND;
+        msg_TX_torque.data = data_TX_torque;
+
+        CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_torque);
+        
+        
         // CAN transmit switch (only for debugging)
 //        CAN_MSG_OBJ msg_TX_switch;
 //        CAN_MSG_FIELD field_TX_switch; 
@@ -582,12 +597,14 @@ int main(void)
             case PRECHARGING:
                 if (conservative_timer_ms >= MAX_CONSERVATION_SECS * 1000) {
                     // Pre-charging took too long
+                    conservative_timer_ms = 0;
                     report_fault(CONSERVATIVE_TIMER_MAXED);
                     break;
                 }
                      
                 if (capacitor_volt > PRECHARGE_THRESHOLD) {
                     // Finished charging to HV on time
+                    conservative_timer_ms = 0;
                     change_state(HV_ENABLED);
                     break;
                 }
@@ -619,30 +636,6 @@ int main(void)
                 break;
             case DRIVE:
                 update_sensor_vals();
-                
-                //  CAN transmit torque request command 
-                CAN_MSG_OBJ msg_TX_torque;
-                
-                CAN_MSG_FIELD field_TX_torque; 
-                field_TX_torque.dlc = 5; 
-                field_TX_torque.idType = 0;
-                field_TX_torque.formatType = 0; 
-                field_TX_torque.frameType = 0; 
-                field_TX_torque.brs = 0;
-                
-                uint8_t data_TX_torque[3] = {
-                    is_hv_requested(), 
-                    (uint16_t)(throttle1 * THROTTLE_MULTIPLIER) >> 8, // torque request upper
-                    (uint16_t)(throttle1 * THROTTLE_MULTIPLIER) & 0b11111111 // torque request lower
-                };
-                
-                msg_TX_torque.field = field_TX_torque; 
-                msg_TX_torque.msgId = TORQUE_REQUEST_COMMAND;
-                msg_TX_torque.data = data_TX_torque;
-                
-                CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_torque);
-        
-              
 
                 if (!is_drive_requested()) {
                     // Drive switch was flipped off
