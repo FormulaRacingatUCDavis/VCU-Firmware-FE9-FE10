@@ -168,13 +168,6 @@ void report_fault(error_t _error) {
     error = _error;
 }
 
-// How long to wait for pre-charging to finish before timing out
-#define MAX_CONSERVATION_SECS 5
-// Keeps track of timer waiting for pre-charging
-unsigned int conservative_timer_ms = 0;
-// Delay between checking pre-charging state
-#define AWAIT_PRECHARGING_DELAY_MS 10
-
 // High voltage state variables
 #define DRIVE_REQ_DELAY_MS 1000
 
@@ -338,12 +331,12 @@ void run_calibration() {
     }
     else {
         // APPS1 = pin8 = RA0
-        throttle1 = getConversion(APPS1);
-        // APPS2 = pin9 = RA1
-        throttle2 = getConversion(APPS2);
-        // BSE1 = pin11 = RA3
-        // BSE2 = pin12 = RA4
-        brake = getConversion(BSE1);
+//        throttle1 = getConversion(APPS1);
+//        // APPS2 = pin9 = RA1
+//        throttle2 = getConversion(APPS2);
+//        // BSE1 = pin11 = RA3
+//        // BSE2 = pin12 = RA4
+//        brake = getConversion(BSE1);
 
         if (throttle1 > throttle1_max) {
             throttle1_max = throttle1;
@@ -383,12 +376,12 @@ error_t temp_error = NONE; // error state before sensor discrepancy error (only 
 
 void update_sensor_vals() {
     // APPS1 = pin8 = RA0
-    throttle1 = getConversion(APPS1);
-    // APPS2 = pin9 = RA1
-    throttle2 = getConversion(APPS2);
-    // BSE1 = pin11 = RA3
-    // BSE2 = pin12 = RA4
-    brake = getConversion(BSE1);
+//    throttle1 = getConversion(APPS1);
+//    // APPS2 = pin9 = RA1
+//    throttle2 = getConversion(APPS2);
+//    // BSE1 = pin11 = RA3
+//    // BSE2 = pin12 = RA4
+//    brake = getConversion(BSE1);
     
      printf("State: %s\r\n", STATE_NAMES[state]);
      printf("Throttle 1: %d\r\n", throttle1);
@@ -448,9 +441,46 @@ void can_receive() {
     } 
 }
 
+/************ Timer ************/
+
+// How long to wait for pre-charging to finish before timing out
+//#define MAX_CONSERVATION_SECS 5
+//// Keeps track of timer waiting for pre-charging
+//unsigned int conservative_timer_ms = 0;
+//// Delay between checking pre-charging state
+//#define AWAIT_PRECHARGING_DELAY_MS 10
+
+bool precharge_timer_start_needed = true;
+
+// runs every time precharge times out 
+void precharge_timer_ISR() { 
+    precharge_timer_start_needed = true;
+    TMR1_Stop();
+    report_fault(CONSERVATIVE_TIMER_MAXED);
+        
+    // CAN msg to show timer ISR works
+        CAN_MSG_OBJ msg_TX_timer;
+        
+        CAN_MSG_FIELD field_TX_timer; 
+        field_TX_timer.dlc = 1; 
+        field_TX_timer.idType = 0;
+        field_TX_timer.formatType = 0; 
+        field_TX_timer.frameType = 0; 
+        field_TX_timer.brs = 0; 
+        
+        uint8_t data_TX_timer[1] = {1}; 
+        
+        msg_TX_timer.field = field_TX_timer; 
+        msg_TX_timer.data = data_TX_timer;
+        msg_TX_timer.msgId = 0x666;
+        CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_timer);
+}
+
+
 /*
                          Main application
  */
+    
 int main(void)
 {
     // initialize the device
@@ -468,6 +498,9 @@ int main(void)
             // (tested and worked)
         }
     }
+    
+    // Set up timer interrupt
+    TMR1_SetInterruptHandler(precharge_timer_ISR);
 
     // Only for debugging. Use this to test the controls on the breadboard
     #if 0
@@ -489,6 +522,7 @@ int main(void)
         // Source: https://docs.google.com/document/d/1q0RL4FmDfVuAp6xp9yW7O-vIvnkwoAXWssC3-vBmNGM/edit?usp=sharing
         
         printf("-----------------------\r\n");
+        
         
         // CAN receive
         can_receive();
@@ -595,23 +629,31 @@ int main(void)
                 
                 break;
             case PRECHARGING:
-                if (conservative_timer_ms >= MAX_CONSERVATION_SECS * 1000) {
-                    // Pre-charging took too long
-                    conservative_timer_ms = 0;
-                    report_fault(CONSERVATIVE_TIMER_MAXED);
-                    break;
+                if (precharge_timer_start_needed) {
+                    TMR1_Start(); 
+                    precharge_timer_start_needed = false;
                 }
+                
+//                if (conservative_timer_ms >= MAX_CONSERVATION_SECS * 1000) {
+//                    // Pre-charging took too long
+//                    conservative_timer_ms = 0;
+//                    report_fault(CONSERVATIVE_TIMER_MAXED);
+//                    break;
+//                }
                      
                 if (capacitor_volt > PRECHARGE_THRESHOLD) {
                     // Finished charging to HV on time
-                    conservative_timer_ms = 0;
+                    
+//                    conservative_timer_ms = 0;
+                    precharge_timer_start_needed = true;
+                    
                     change_state(HV_ENABLED);
                     break;
                 }
                 
                 // Check if pre-charge is finished for every delay
-                __delay_ms(AWAIT_PRECHARGING_DELAY_MS);
-                conservative_timer_ms += AWAIT_PRECHARGING_DELAY_MS;
+//                __delay_ms(AWAIT_PRECHARGING_DELAY_MS);
+//                conservative_timer_ms += AWAIT_PRECHARGING_DELAY_MS;
                 break;
             case HV_ENABLED:
                 update_sensor_vals();
