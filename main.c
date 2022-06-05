@@ -264,12 +264,12 @@ void run_calibration() {
     }
     else {
         // APPS1 = pin8 = RA0
-//        throttle1 = getConversion(APPS1);
-//        // APPS2 = pin9 = RA1
-//        throttle2 = getConversion(APPS2);
-//        // BSE1 = pin11 = RA3
-//        // BSE2 = pin12 = RA4
-//        brake = getConversion(BSE1);
+        throttle1 = getConversion(APPS1);
+        // APPS2 = pin9 = RA1
+        throttle2 = getConversion(APPS2);
+        // BSE1 = pin11 = RA3
+        // BSE2 = pin12 = RA4
+        brake = getConversion(BSE1);
 
         if (throttle1 > throttle1_max) {
             throttle1_max = throttle1;
@@ -289,17 +289,7 @@ void run_calibration() {
         }
         if (brake < brake_min) {
             brake_min = brake;
-        }    
-
-         printf("throttle1: %d\r\n", throttle1);
-         printf("throttle1_max: %d\r\n", throttle1_max);
-         printf("throttle1_min: %d\r\n", throttle1_min); 
-         printf("throttle2: %d\r\n", throttle2);         
-         printf("throttle2_max: %d\r\n", throttle2_max);
-         printf("throttle2_min: %d\r\n", throttle2_min);
-         printf("brake: %d\r\n", brake);
-         printf("brake_max: %d\r\n", brake_max);
-         printf("brake_min: %d\r\n", brake_min);
+        }
     }
 }
 
@@ -316,11 +306,11 @@ void update_sensor_vals() {
     // BSE2 = pin12 = RA4
     brake = getConversion(BSE1);
 
-    if (error != SENSOR_DISCREPANCY && has_discrepancy() ) {
-        temp_state = state;
-        temp_error = error;
-        report_fault(SENSOR_DISCREPANCY);
-    }
+//    if (error != SENSOR_DISCREPANCY && has_discrepancy() ) {
+//        temp_state = state;
+//        temp_error = error;
+//        report_fault(SENSOR_DISCREPANCY);
+//    }
 }
 
 /************ Capacitor ************/
@@ -402,7 +392,7 @@ unsigned int discrepancy_timer_ms = 0;
 
 
 /*
-                         Main application
+            Main application
  */
     
 int main(void)
@@ -425,19 +415,6 @@ int main(void)
     
     // Set up timer interrupt
     TMR1_SetInterruptHandler(precharge_timer_ISR);
-
-    // Only for debugging. Use this to test the controls on the breadboard
-    #if 0
-    while (1)
-    {
-        update_sensor_vals();
-        printf("Throttle 1: %d\r\n", throttle1);
-        printf("Throttle 2: %d\r\n", throttle2);
-        printf("Brake : %d\r\n", brake);
-        printf("HV switch: %d\r\n", is_hv_requested());
-        printf("Drive switch: %d\r\n\n", is_drive_requested());
-    }
-    #endif
     
     printf("Starting in %s state", STATE_NAMES[state]);
     
@@ -458,7 +435,7 @@ int main(void)
         field_TX_state.dlc = 1; 
         field_TX_state.idType = 0;
         field_TX_state.formatType = 0; 
-        field_TX_state.frameType = 0; 
+        field_TX_state.frameType = 0;
         field_TX_state.brs = 0; 
         
         uint8_t data_TX_state[1] = {state}; 
@@ -473,7 +450,7 @@ int main(void)
         
         __delay_ms(50);
         
-        /*/ CAN transmit brake command
+        // CAN transmit brake command
         CAN_MSG_OBJ msg_TX_brake;
         
         CAN_MSG_FIELD field_TX_brake; 
@@ -490,22 +467,26 @@ int main(void)
         msg_TX_brake.msgId = BRAKE_COMMAND;
         CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_brake);
         
-        __delay_ms(50);*/
+        __delay_ms(50);
         
         //  CAN transmit torque request command 
         CAN_MSG_OBJ msg_TX_torque;
 
         CAN_MSG_FIELD field_TX_torque; 
-        field_TX_torque.dlc = 3; 
+        field_TX_torque.dlc = 5;//3; 
         field_TX_torque.idType = 0;
         field_TX_torque.formatType = 0; 
         field_TX_torque.frameType = 0; 
         field_TX_torque.brs = 0;
 
-        uint8_t data_TX_torque[3] = {
-            is_hv_requested(), 
-            (uint16_t)(throttle1 * THROTTLE_MULTIPLIER) >> 8, // torque request upper
-            (uint16_t)(throttle1 * THROTTLE_MULTIPLIER) & 0b11111111 // torque request lower
+        uint8_t data_TX_torque[5] = {
+            is_hv_requested(),
+            (uint8_t)(throttle1 >> 8),
+            throttle1 & 0xff,
+            (uint8_t)(throttle2 >> 8),
+            throttle2 & 0xff
+//            (uint16_t)(throttle1 * THROTTLE_MULTIPLIER) >> 8, // torque request upper
+//            (uint16_t)(throttle1 * THROTTLE_MULTIPLIER) & 0xff // torque request lower
         };
 
         msg_TX_torque.field = field_TX_torque; 
@@ -515,23 +496,6 @@ int main(void)
         CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_torque);
         
         __delay_ms(50);
-        
-        // CAN transmit switch (only for debugging)
-//        CAN_MSG_OBJ msg_TX_switch;
-//        CAN_MSG_FIELD field_TX_switch; 
-//
-//        field_TX_switch.dlc = 1; 
-//        field_TX_switch.idType = 0;
-//        field_TX_switch.formatType = 0; 
-//        field_TX_switch.frameType = 0; 
-//        field_TX_switch.brs = 0; 
-//        
-//        msg_TX_switch.field = field_TX_switch; 
-//        msg_TX_switch.msgId = SWITCHES;
-//        uint8_t data_TX_switch[1] = {switches}; 
-//        msg_TX_switch.data = data_TX_switch;
-//        CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_switch);
-        
 
         switch (state) {
             case LV:
