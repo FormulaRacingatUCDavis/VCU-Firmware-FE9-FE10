@@ -632,8 +632,8 @@ static void CAN1_RX_FIFO_FilterMaskConfiguration(void)
     C1FLTOBJ0L = 0xD0;
     // EID 0; EXIDE disabled; SID11 disabled; 
     C1FLTOBJ0H = 0x00;
-    // MSID 2047; MEID 0; 
-    C1MASK0L = 0x7FF;
+    // MSID 0; MEID 0; 
+    C1MASK0L = 0x00;
     // MEID 0; MSID11 disabled; MIDE enabled; 
     C1MASK0H = 0x4000;
     // Enable the filter 0

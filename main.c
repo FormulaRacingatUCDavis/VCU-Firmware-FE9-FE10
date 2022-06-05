@@ -1,14 +1,14 @@
 /**
-  Generated main.c file from MPLAB Code Configurator
+  main.c file for FE9 VCU
 
   @Company
-    Microchip Technology Inc.
+    FRUCD
 
   @File Name
     main.c
 
   @Summary
-    This is the generated main.c using PIC24 / dsPIC33 / PIC32MM MCUs.
+    This is the generated main.c using dsPIC33 MCU.
 
   @Description
     This source file provides main entry point for system initialization and application code development.
@@ -19,68 +19,6 @@
         Compiler          :  XC16 v1.61
         MPLAB 	          :  MPLAB X v5.45
 */
-
-/*
-    (c) 2020 Microchip Technology Inc. and its subsidiaries. You may use this
-    software and any derivatives exclusively with Microchip products.
-
-    THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
-    EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
-    WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
-    PARTICULAR PURPOSE, OR ITS INTERACTION WITH MICROCHIP PRODUCTS, COMBINATION
-    WITH ANY OTHER PRODUCTS, OR USE IN ANY APPLICATION.
-
-    IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
-    INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
-    WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
-    BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
-    FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
-    ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
-    THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
-
-    MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE
-    TERMS.
-*/
-
-
-/* Debug only */
-
-//#ifndef _XTAL_FREQ
-//#define _XTAL_FREQ  8000000UL
-//#endif
-//
-//#ifndef FCY
-//#define FCY 8000000UL
-//#endif
-//
-//#include "mcc_generated_files/mcc.h"
-//#include "mcc_generated_files/system.h"
-//#include <libpic30.h>
-
-//int main(void)
-//{
-//    CAN_MSG_OBJ msg_RX;
-//    
-//    CAN_MSG_OBJ msg_TX;
-//    msg_TX.msgId = 0x02;
-//    uint8_t data_TX[1] = {0x03};
-//    msg_TX.data = data_TX;
-//    
-//    // initialize the device
-//    SYSTEM_Initialize();
-//    while (1)
-//    {
-////        if(CAN1_Receive(&msg_RX))
-////        {
-////            CAN1_Transmit(CAN1_TX_TXQ, &msg_TX);
-////        }
-//        CAN1_Transmit(CAN1_TX_TXQ, &msg_TX);
-//    }
-//    
-//    return 1;
-//}
-
-/*********/
 
 /**
   Section: Included Files
@@ -371,23 +309,18 @@ error_t temp_error = NONE; // error state before sensor discrepancy error (only 
 
 void update_sensor_vals() {
     // APPS1 = pin8 = RA0
-//    throttle1 = getConversion(APPS1);
-//    // APPS2 = pin9 = RA1
-//    throttle2 = getConversion(APPS2);
-//    // BSE1 = pin11 = RA3
-//    // BSE2 = pin12 = RA4
-//    brake = getConversion(BSE1);
-    
-     printf("State: %s\r\n", STATE_NAMES[state]);
-     printf("Throttle 1: %d\r\n", throttle1);
-     printf("Throttle 2: %d\r\n", throttle2);
-     printf("Brake: %d\r\n", brake);
+    throttle1 = getConversion(APPS1);
+    // APPS2 = pin9 = RA1
+    throttle2 = getConversion(APPS2);
+    // BSE1 = pin11 = RA3
+    // BSE2 = pin12 = RA4
+    brake = getConversion(BSE1);
 
-   if (error != SENSOR_DISCREPANCY && has_discrepancy() ) {
-       temp_state = state;
-       temp_error = error;
-       report_fault(SENSOR_DISCREPANCY);
-   }
+    if (error != SENSOR_DISCREPANCY && has_discrepancy() ) {
+        temp_state = state;
+        temp_error = error;
+        report_fault(SENSOR_DISCREPANCY);
+    }
 }
 
 /************ Capacitor ************/
@@ -399,12 +332,17 @@ uint16_t capacitor_volt = 0;
 
 typedef enum {
     VEHICLE_STATE = 0x0c0,
+    DRIVER_SWITCHES = 0x0d0,
     TORQUE_REQUEST_COMMAND = 0x766,
+    BRAKE_COMMAND = 0x767,
+    BMS_STATUS_MSG = 0x380,
+    PEI_CURRENT = 0x387,
+    BMS_VOLTAGES = 0x388,
     BMS_TEMPERATURES = 0x389,
-    SWITCHES = 0x0d0,
-    MOTOR_CONTROLLER_ESTOP = 0x366,
-    MOTOR_CONTROLLER_PDOSEND = 0x566,
-    BRAKE_COMMAND = 0x767
+    MC_ESTOP = 0x366,
+    MC_DEBUG = 0x466,
+    MC_PDO_SEND = 0x566,
+    MC_PDO_ACK = 0x666
 } CAN_ID;
 
 CAN_MSG_OBJ msg_RX;
@@ -414,19 +352,19 @@ void can_receive() {
     if (CAN1_Receive(&msg_RX)) {
         INDICATOR_1_Toggle();
         switch (msg_RX.msgId) {
-            case SWITCHES:
+            case DRIVER_SWITCHES:
                 switches = msg_RX.data[0]; 
                 break;
             case BMS_TEMPERATURES:
                 PACK_TEMP = msg_RX.data[7];
                 temp_attenuate();
                 break;
-            case MOTOR_CONTROLLER_ESTOP:
-                INDICATOR_2_Toggle();
+            case MC_ESTOP:
                 if (msg_RX.data[0]) { // if estop detected in any state
                     report_fault(ESTOP);
                 }
-            case MOTOR_CONTROLLER_PDOSEND:
+            case MC_PDO_ACK:
+                INDICATOR_2_Toggle();
                 capacitor_volt = (msg_RX.data[0] << 8); // upper bits
                 capacitor_volt += msg_RX.data[1]; // lower bits
             default:
@@ -451,24 +389,9 @@ bool precharge_timer_start_needed = true;
 void precharge_timer_ISR() { 
     precharge_timer_start_needed = true;
     TMR1_Stop();
-    report_fault(CONSERVATIVE_TIMER_MAXED);
-        
-    // CAN msg to show timer ISR works
-        CAN_MSG_OBJ msg_TX_timer;
-        
-        CAN_MSG_FIELD field_TX_timer; 
-        field_TX_timer.dlc = 1; 
-        field_TX_timer.idType = 0;
-        field_TX_timer.formatType = 0; 
-        field_TX_timer.frameType = 0; 
-        field_TX_timer.brs = 0; 
-        
-        uint8_t data_TX_timer[1] = {1}; 
-        
-        msg_TX_timer.field = field_TX_timer; 
-        msg_TX_timer.data = data_TX_timer;
-        msg_TX_timer.msgId = 0x666;
-        CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_timer);
+    if (state == PRECHARGING) {
+        report_fault(CONSERVATIVE_TIMER_MAXED);
+    }
 }
 
 
@@ -550,7 +473,7 @@ int main(void)
         
         __delay_ms(50);
         
-        // CAN transmit brake command
+        /*/ CAN transmit brake command
         CAN_MSG_OBJ msg_TX_brake;
         
         CAN_MSG_FIELD field_TX_brake; 
@@ -567,7 +490,7 @@ int main(void)
         msg_TX_brake.msgId = BRAKE_COMMAND;
         CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_brake);
         
-        __delay_ms(50);
+        __delay_ms(50);*/
         
         //  CAN transmit torque request command 
         CAN_MSG_OBJ msg_TX_torque;
@@ -591,6 +514,7 @@ int main(void)
 
         CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_torque);
         
+        __delay_ms(50);
         
         // CAN transmit switch (only for debugging)
 //        CAN_MSG_OBJ msg_TX_switch;

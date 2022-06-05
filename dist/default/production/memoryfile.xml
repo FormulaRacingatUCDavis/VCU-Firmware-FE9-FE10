@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project>
-  <executable name="dist/default/production/VCU-Firmware-FE9-673a1c73f6f4209c619509f88453c486935dce77.production.elf">
+  <executable name="dist/default/production/VCU-Firmware-FE9.production.elf">
     <memory name="data">
       <units>bytes</units>
       <length>32768</length>
-      <used>274</used>
-      <free>32494</free>
+      <used>282</used>
+      <free>32486</free>
     </memory>
     <memory name="program">
       <units>bytes</units>
       <length>269184</length>
-      <used>20547</used>
-      <free>248637</free>
+      <used>20697</used>
+      <free>248487</free>
     </memory>
   </executable>
 </project>

@@ -53,6 +53,10 @@
 */
 
 static void (*ADC1_CommonDefaultInterruptHandler)(void);
+static void (*ADC1_APPS1DefaultInterruptHandler)(uint16_t adcVal);
+static void (*ADC1_APPS2DefaultInterruptHandler)(uint16_t adcVal);
+static void (*ADC1_BSE1DefaultInterruptHandler)(uint16_t adcVal);
+static void (*ADC1_BSE2DefaultInterruptHandler)(uint16_t adcVal);
 static void (*ADC1_channel_AN16DefaultInterruptHandler)(uint16_t adcVal);
 static void (*ADC1_channel_AN17DefaultInterruptHandler)(uint16_t adcVal);
 static void (*ADC1_channel_AN18DefaultInterruptHandler)(uint16_t adcVal);
@@ -148,6 +152,10 @@ void ADC1_Initialize (void)
 	
     //Assign Default Callbacks
     ADC1_SetCommonInterruptHandler(&ADC1_CallBack);
+    ADC1_SetAPPS1InterruptHandler(&ADC1_APPS1_CallBack);
+    ADC1_SetAPPS2InterruptHandler(&ADC1_APPS2_CallBack);
+    ADC1_SetBSE1InterruptHandler(&ADC1_BSE1_CallBack);
+    ADC1_SetBSE2InterruptHandler(&ADC1_BSE2_CallBack);
     ADC1_Setchannel_AN16InterruptHandler(&ADC1_channel_AN16_CallBack);
     ADC1_Setchannel_AN17InterruptHandler(&ADC1_channel_AN17_CallBack);
     ADC1_Setchannel_AN18InterruptHandler(&ADC1_channel_AN18_CallBack);
@@ -182,12 +190,12 @@ void ADC1_Initialize (void)
     // Enabling Power for the Shared Core
     ADC1_SharedCorePowerEnable();
 
-    //TRGSRC0 None; TRGSRC1 None; 
-    ADTRIG0L = 0x00;
-    //TRGSRC3 None; TRGSRC2 None; 
-    ADTRIG0H = 0x00;
-    //TRGSRC4 None; TRGSRC5 None; 
-    ADTRIG1L = 0x00;
+    //TRGSRC0 Common Software Trigger; TRGSRC1 Common Software Trigger; 
+    ADTRIG0L = 0x101;
+    //TRGSRC3 Common Software Trigger; TRGSRC2 None; 
+    ADTRIG0H = 0x100;
+    //TRGSRC4 Common Software Trigger; TRGSRC5 None; 
+    ADTRIG1L = 0x01;
     //TRGSRC6 None; TRGSRC7 None; 
     ADTRIG1H = 0x00;
     //TRGSRC8 None; TRGSRC9 None; 
@@ -235,6 +243,110 @@ void __attribute__ ((weak)) ADC1_Tasks ( void )
 
         // clear the ADC1 interrupt flag
         IFS5bits.ADCIF = 0;
+    }
+}
+
+void __attribute__ ((weak)) ADC1_APPS1_CallBack( uint16_t adcVal )
+{ 
+
+}
+
+void ADC1_SetAPPS1InterruptHandler(void* handler)
+{
+    ADC1_APPS1DefaultInterruptHandler = handler;
+}
+
+void __attribute__ ((weak)) ADC1_APPS1_Tasks ( void )
+{
+    uint16_t valAPPS1;
+
+    if(ADSTATLbits.AN0RDY)
+    {
+        //Read the ADC value from the ADCBUF
+        valAPPS1 = ADCBUF0;
+
+        if(ADC1_APPS1DefaultInterruptHandler) 
+        { 
+            ADC1_APPS1DefaultInterruptHandler(valAPPS1); 
+        }
+    }
+}
+
+void __attribute__ ((weak)) ADC1_APPS2_CallBack( uint16_t adcVal )
+{ 
+
+}
+
+void ADC1_SetAPPS2InterruptHandler(void* handler)
+{
+    ADC1_APPS2DefaultInterruptHandler = handler;
+}
+
+void __attribute__ ((weak)) ADC1_APPS2_Tasks ( void )
+{
+    uint16_t valAPPS2;
+
+    if(ADSTATLbits.AN1RDY)
+    {
+        //Read the ADC value from the ADCBUF
+        valAPPS2 = ADCBUF1;
+
+        if(ADC1_APPS2DefaultInterruptHandler) 
+        { 
+            ADC1_APPS2DefaultInterruptHandler(valAPPS2); 
+        }
+    }
+}
+
+void __attribute__ ((weak)) ADC1_BSE1_CallBack( uint16_t adcVal )
+{ 
+
+}
+
+void ADC1_SetBSE1InterruptHandler(void* handler)
+{
+    ADC1_BSE1DefaultInterruptHandler = handler;
+}
+
+void __attribute__ ((weak)) ADC1_BSE1_Tasks ( void )
+{
+    uint16_t valBSE1;
+
+    if(ADSTATLbits.AN3RDY)
+    {
+        //Read the ADC value from the ADCBUF
+        valBSE1 = ADCBUF3;
+
+        if(ADC1_BSE1DefaultInterruptHandler) 
+        { 
+            ADC1_BSE1DefaultInterruptHandler(valBSE1); 
+        }
+    }
+}
+
+void __attribute__ ((weak)) ADC1_BSE2_CallBack( uint16_t adcVal )
+{ 
+
+}
+
+void ADC1_SetBSE2InterruptHandler(void* handler)
+{
+    ADC1_BSE2DefaultInterruptHandler = handler;
+}
+
+void __attribute__ ((weak)) ADC1_BSE2_Tasks ( void )
+{
+    uint16_t valBSE2;
+
+    if(ADSTATLbits.AN4RDY)
+    {
+        //Read the ADC value from the ADCBUF
+        valBSE2 = ADCBUF4;
+
+        if(ADC1_BSE2DefaultInterruptHandler) 
+        { 
+            ADC1_BSE2DefaultInterruptHandler(valBSE2); 
+        }
     }
 }
 
