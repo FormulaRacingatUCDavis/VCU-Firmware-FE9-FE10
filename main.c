@@ -237,11 +237,6 @@ uint16_t brake_max = 0;
 uint16_t brake_min = 0;
 uint16_t brake_range = 0;
 
-// discrepancy timer
-#define MAX_DISCREPANCY_MS 100 
-unsigned int discrepancy_timer_ms = 0;
-#define AWAIT_DISCREPANCY_DELAY_MS 10
-
 
 // check differential between the throttle sensors
 // returns true only if the sensor discrepancy is > 10%
@@ -477,6 +472,12 @@ void precharge_timer_ISR() {
 }
 
 
+// discrepancy timer
+#define MAX_DISCREPANCY_MS 100 
+unsigned int discrepancy_timer_ms = 0;
+#define AWAIT_DISCREPANCY_DELAY_MS 10
+
+
 /*
                          Main application
  */
@@ -547,6 +548,7 @@ int main(void)
         msg_TX_state.msgId = VEHICLE_STATE;
         CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_state);
         
+        __delay_ms(50);
         
         // CAN transmit brake command
         CAN_MSG_OBJ msg_TX_brake;
@@ -560,17 +562,18 @@ int main(void)
         
         uint8_t data_TX_brake[1] = {brake}; 
         
-        msg_TX_brake.field = field_TX_state; 
-        msg_TX_brake.data = data_TX_state;
+        msg_TX_brake.field = field_TX_brake; 
+        msg_TX_brake.data = data_TX_brake;
         msg_TX_brake.msgId = BRAKE_COMMAND;
         CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_brake);
         
+        __delay_ms(50);
         
         //  CAN transmit torque request command 
         CAN_MSG_OBJ msg_TX_torque;
 
         CAN_MSG_FIELD field_TX_torque; 
-        field_TX_torque.dlc = 5; 
+        field_TX_torque.dlc = 3; 
         field_TX_torque.idType = 0;
         field_TX_torque.formatType = 0; 
         field_TX_torque.frameType = 0; 
