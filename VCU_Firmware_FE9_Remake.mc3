@@ -47564,11 +47564,11 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="TMR1" name="actualPeriod"/>
-         <value>4.194304</value>
+         <value>0.009984</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="TMR1" name="callBackRate"/>
-         <value>4.194304</value>
+         <value>0.009984</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="TMR1" name="clockSourceSelect"/>
@@ -47580,11 +47580,11 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="TMR1" name="customPR"/>
-         <value>65535</value>
+         <value>155</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="TMR1" name="inputMode"/>
-         <value>periodMode</value>
+         <value>customTmrMode</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="TMR1" name="localClockFreq"/>
@@ -47608,7 +47608,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="TMR1" name="requestedPeriod"/>
-         <value>4.194304</value>
+         <value>0.01</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="TMR1" name="tickerFactor"/>
@@ -47724,7 +47724,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.RegisterKey" moduleName="TMR1" registerAlias="PR"/>
-         <value>65535</value>
+         <value>155</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.RegisterKey" moduleName="TMR1" registerAlias="TCON"/>
@@ -47736,7 +47736,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.SettingKey" moduleName="TMR1" registerAlias="PR" settingAlias="PR"/>
-         <value>65535</value>
+         <value>155</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.SettingKey" moduleName="TMR1" registerAlias="TCON" settingAlias="PRWIP"/>
@@ -49021,16 +49021,16 @@
          <hash>1e8e3f9e541e32695d9350039ccec3e2af9334cb6fca3d713458f6e5ef797dd6</hash>
       </entry>
       <entry>
-         <file>mcc_generated_files/system.c</file>
-         <hash>e7da13c7d57706659b356a8e16e49ec08d2d097f8c5bb2e25af2caa5ab2a68b7</hash>
-      </entry>
-      <entry>
          <file>mcc_generated_files/reset.h</file>
          <hash>52f26f982ddb984a06c16b3631ecfa26932ce9e32930978c1b24aadb59723c5f</hash>
       </entry>
       <entry>
          <file>mcc_generated_files/can2.c</file>
          <hash>28b73a46bd1bc493e2980e21bef61801c88b25ce0d0993ae16476f91c4cbacaf</hash>
+      </entry>
+      <entry>
+         <file>mcc_generated_files/system.c</file>
+         <hash>8d0167a1bf7457b2e9fae30f1418c4bddf7d6f2f50138b736007e764510a4ca5</hash>
       </entry>
       <entry>
          <file>mcc_generated_files/can1.c</file>
@@ -49062,7 +49062,7 @@
       </entry>
       <entry>
          <file>mcc_generated_files/mcc.h</file>
-         <hash>b5b16f3d997aade2d2ddc32ef6ced09050b34373f517c88d06c9edbcfbbd3fe8</hash>
+         <hash>80b411ff028dd6f0a5e0a5556ec748838d8c641beaccb4f53b961569ee8997b6</hash>
       </entry>
       <entry>
          <file>mcc_generated_files/interrupt_manager.c</file>
@@ -49074,7 +49074,7 @@
       </entry>
       <entry>
          <file>mcc_generated_files/pin_manager.c</file>
-         <hash>081fa868530cb9199d22150a678be1133ca93b8f241bf836e6c933272182a122</hash>
+         <hash>26c8cb143a81d306347a31cbf1dc26d0f5915659b637c56b813264059627a7e9</hash>
       </entry>
       <entry>
          <file>mcc_generated_files/watchdog.h</file>
@@ -49086,7 +49086,7 @@
       </entry>
       <entry>
          <file>mcc_generated_files/tmr1.c</file>
-         <hash>07967d8cb82c72bf7b91450f58b712b9bea097dff08b8d037dcc9d79543b1d10</hash>
+         <hash>d834d15c17f3f5d21425dbf91f07a09800352a439747c6276fb3efb0d8e2b56a</hash>
       </entry>
       <entry>
          <file>mcc_generated_files/can_module_features.h</file>

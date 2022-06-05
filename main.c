@@ -106,10 +106,6 @@ void report_fault(error_t _error) {
     error = _error;
 }
 
-// High voltage state variables
-#define DRIVE_REQ_DELAY_MS 1000
-
-
 /************ Switches ************/
 
 /*
@@ -172,7 +168,7 @@ uint16_t per_throttle2 = 0;
 
 uint16_t brake = 0;
 uint16_t brake_max = 0;
-uint16_t brake_min = 0;
+uint16_t brake_min = 0x7FFF;
 uint16_t brake_range = 0;
 
 
@@ -180,8 +176,6 @@ uint16_t brake_range = 0;
 // returns true only if the sensor discrepancy is > 10%
 // Note: after verifying there's no discrepancy, can use either sensor(1 or 2) for remaining checks
 bool has_discrepancy() {
-    // check throttle
-    
     // calculate percentage of throttle 1
     uint16_t temp_throttle1 = throttle1;
     if (temp_throttle1 > throttle1_max) {
@@ -209,14 +203,14 @@ bool brake_implausible() {
     uint16_t temp_throttle = throttle1; 
     
     // subtract dead zone 15%
-    uint16_t temp_brake = brake - ((throttle_range)/6);
+    uint16_t temp_brake = brake - ((brake_range)/6);
     if (temp_brake > brake_max){
         temp_brake = brake_max;
     }
     if (temp_brake < brake_min){
         temp_brake = brake_min;
     }
-    temp_brake = (uint16_t)((temp_brake-brake_min)*100.0 / throttle_range);
+    temp_brake = (uint16_t)((temp_brake-brake_min)*100.0 / brake_range);
     
     
     if (state == FAULT && error == BRAKE_IMPLAUSIBLE) {
@@ -250,46 +244,33 @@ uint16_t getConversion(ADC1_CHANNEL channel){
 // On the breadboard, the range of values for the potentiometer is 0 to 4095
 #define PEDAL_MAX 4095
 
-bool init_calibration = true;
 void run_calibration() {
-    if (init_calibration) {
-        // set up values at start of calibration
-        throttle1_max = 0;
-        throttle1_min = 0x7FFF;
-        throttle2_max = 0;
-        throttle2_min = 0x7FFF;
-        brake_max = 0;
-        brake_min = 0x7FFF;
-        init_calibration = false;
+    // APPS1 = pin8 = RA0
+    throttle1 = getConversion(APPS1);
+    // APPS2 = pin9 = RA1
+    throttle2 = getConversion(APPS2);
+    // BSE1 = pin11 = RA3
+    // BSE2 = pin12 = RA4
+    brake = getConversion(BSE1);
+
+    if (throttle1 > throttle1_max) {
+        throttle1_max = throttle1;
     }
-    else {
-        // APPS1 = pin8 = RA0
-        throttle1 = getConversion(APPS1);
-        // APPS2 = pin9 = RA1
-        throttle2 = getConversion(APPS2);
-        // BSE1 = pin11 = RA3
-        // BSE2 = pin12 = RA4
-        brake = getConversion(BSE1);
+    if (throttle1 < throttle1_min) {
+        throttle1_min = throttle1;
+    }
+    if (throttle2 > throttle2_max) {
+        throttle2_max = throttle2;
+    }
+    if (throttle2 < throttle2_min) {
+        throttle2_min = throttle2;    
+    }
 
-        if (throttle1 > throttle1_max) {
-            throttle1_max = throttle1;
-        }
-        if (throttle1 < throttle1_min) {
-            throttle1_min = throttle1;
-        }
-        if (throttle2 > throttle2_max) {
-            throttle2_max = throttle2;
-        }
-        if (throttle2 < throttle2_min) {
-            throttle2_min = throttle2;    
-        }
-
-        if (brake > brake_max) {
-            brake_max = brake;
-        }
-        if (brake < brake_min) {
-            brake_min = brake;
-        }
+    if (brake > brake_max) {
+        brake_max = brake;
+    }
+    if (brake < brake_min) {
+        brake_min = brake;
     }
 }
 
@@ -367,29 +348,34 @@ void can_receive() {
 /************ Timer ************/
 
 // How long to wait for pre-charging to finish before timing out
-//#define MAX_CONSERVATION_SECS 5
-//// Keeps track of timer waiting for pre-charging
-//unsigned int conservative_timer_ms = 0;
-//// Delay between checking pre-charging state
-//#define AWAIT_PRECHARGING_DELAY_MS 10
-
-bool precharge_timer_start_needed = true;
-
-// runs every time precharge times out 
-void precharge_timer_ISR() { 
-    precharge_timer_start_needed = true;
-    TMR1_Stop();
-    if (state == PRECHARGING) {
-        report_fault(CONSERVATIVE_TIMER_MAXED);
-    }
-}
-
-
+#define PRECHARGE_TIMEOUT_MS 5000
+// Keeps track of timer waiting for pre-charging
+unsigned int precharge_timer_ms = 0;
+// Delay between checking pre-charging state
+#define TMR1_PERIOD_MS 10
 // discrepancy timer
 #define MAX_DISCREPANCY_MS 100 
 unsigned int discrepancy_timer_ms = 0;
-#define AWAIT_DISCREPANCY_DELAY_MS 10
 
+// runs every 10ms; used for precharge timeout and sensor discrepancy
+void ten_ms_timer_ISR() {
+    if (state == PRECHARGING) {
+        precharge_timer_ms += TMR1_PERIOD_MS;
+        if (precharge_timer_ms > PRECHARGE_TIMEOUT_MS) {
+            report_fault(CONSERVATIVE_TIMER_MAXED);
+        }
+    } else {
+        precharge_timer_ms = 0;
+    }
+    if (has_discrepancy()) {
+        discrepancy_timer_ms += TMR1_PERIOD_MS;
+        if (discrepancy_timer_ms > MAX_DISCREPANCY_MS) {
+            // ***** UNCOMMENT WHEN PEDALS WORK *****
+            //report_fault(SENSOR_DISCREPANCY);
+        }
+    }
+        
+}
 
 /*
             Main application
@@ -407,23 +393,17 @@ int main(void)
     CAN1_OperationModeSet(CAN_CONFIGURATION_MODE);
     if(CAN_CONFIGURATION_MODE == CAN1_OperationModeGet()) {
         if(CAN_OP_MODE_REQUEST_SUCCESS == CAN1_OperationModeSet(CAN_NORMAL_2_0_MODE)) {
-            // set up successful
-            // blink lights here
-            // (tested and worked)
+            // CAN set up successful
         }
     }
     
     // Set up timer interrupt
-    TMR1_SetInterruptHandler(precharge_timer_ISR);
-    
-    printf("Starting in %s state", STATE_NAMES[state]);
+    TMR1_SetInterruptHandler(ten_ms_timer_ISR);
+    TMR1_Start();
     
     while (1) {
         // Main FSM
         // Source: https://docs.google.com/document/d/1q0RL4FmDfVuAp6xp9yW7O-vIvnkwoAXWssC3-vBmNGM/edit?usp=sharing
-        
-        printf("-----------------------\r\n");
-        
         
         // CAN receive
         can_receive();
@@ -448,7 +428,7 @@ int main(void)
         msg_TX_state.msgId = VEHICLE_STATE;
         CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_state);
         
-        __delay_ms(50);
+        //__delay_ms(50);
         
         // CAN transmit brake command
         CAN_MSG_OBJ msg_TX_brake;
@@ -467,7 +447,7 @@ int main(void)
         msg_TX_brake.msgId = BRAKE_COMMAND;
         CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_brake);
         
-        __delay_ms(50);
+        //__delay_ms(50);
         
         //  CAN transmit torque request command 
         CAN_MSG_OBJ msg_TX_torque;
@@ -495,7 +475,7 @@ int main(void)
 
         CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_torque);
         
-        __delay_ms(50);
+        //__delay_ms(50);
 
         switch (state) {
             case LV:
@@ -520,31 +500,16 @@ int main(void)
                 
                 break;
             case PRECHARGING:
-                if (precharge_timer_start_needed) {
-                    TMR1_Start(); 
-                    precharge_timer_start_needed = false;
-                }
-                
-//                if (conservative_timer_ms >= MAX_CONSERVATION_SECS * 1000) {
-//                    // Pre-charging took too long
-//                    conservative_timer_ms = 0;
-//                    report_fault(CONSERVATIVE_TIMER_MAXED);
-//                    break;
-//                }
-                     
                 if (capacitor_volt > PRECHARGE_THRESHOLD) {
                     // Finished charging to HV on time
-                    
-//                    conservative_timer_ms = 0;
-                    precharge_timer_start_needed = true;
-                    
                     change_state(HV_ENABLED);
                     break;
                 }
-                
-                // Check if pre-charge is finished for every delay
-//                __delay_ms(AWAIT_PRECHARGING_DELAY_MS);
-//                conservative_timer_ms += AWAIT_PRECHARGING_DELAY_MS;
+                if (!is_hv_requested()) {
+                    // Driver flipped off HV switch
+                    change_state(LV);
+                    break;
+                }
                 break;
             case HV_ENABLED:
                 update_sensor_vals();
@@ -637,8 +602,8 @@ int main(void)
                                 change_state(temp_state);
                             }
                         }
-                        __delay_ms(AWAIT_DISCREPANCY_DELAY_MS);
-                        discrepancy_timer_ms += AWAIT_DISCREPANCY_DELAY_MS;
+                        //__delay_ms(TMR1_PERIOD_MS);
+                        discrepancy_timer_ms += TMR1_PERIOD_MS;
                         
                         break;
                     case BRAKE_IMPLAUSIBLE:
