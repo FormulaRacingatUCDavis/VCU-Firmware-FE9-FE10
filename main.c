@@ -36,53 +36,17 @@
 #include "mcc_generated_files/system.h"
 #include <libpic30.h>
 
+// general includes
 #include <string.h>
 #include <time.h>
 #include <math.h>
 #include <stdio.h>
 
+// project includes
+#include "can_manager.h"
+#include "fsm.h"
 
-/************ States ************/ 
-
-typedef enum {
-    LV,
-    PRECHARGING,
-    HV_ENABLED,
-    DRIVE,
-    FAULT
-} state_t;
-
-typedef enum {
-    NONE,
-    DRIVE_REQUEST_FROM_LV,
-    CONSERVATIVE_TIMER_MAXED,
-    BRAKE_NOT_PRESSED,
-    HV_DISABLED_WHILE_DRIVING,
-    SENSOR_DISCREPANCY,
-    BRAKE_IMPLAUSIBLE,
-    ESTOP
-} error_t;
-
-// Initial FSM state
-state_t state = LV;
-error_t error = NONE;
-
-const char* STATE_NAMES[] = {
-    "LV", 
-    "PRECHARGING", 
-    "HV_ENABLED", 
-    "DRIVE", 
-    "FAULT"
-};
-const char* ERROR_NAMES[] = {
-    "NONE", 
-    "DRIVE_REQUEST_FROM_LV", 
-    "CONSERVATIVE_TIMER_MAXED", 
-    "BRAKE_NOT_PRESSED", 
-    "HV_DISABLED_WHILE_DRIVE",
-    "SENSOR_DISCREPANCY",
-    "BRAKE_IMPLAUSIBLE"
-};
+/************ States ************/
 
 void change_state(const state_t new_state) {
     // Handle edge cases
@@ -90,18 +54,12 @@ void change_state(const state_t new_state) {
         // Reset the error cause when exiting fault state
         error = NONE;
     }
-        
-    // Print state transition
-    printf("%s -> %s\r\n", STATE_NAMES[state], STATE_NAMES[new_state]);
     
     state = new_state;
 }
 
 void report_fault(error_t _error) {
     change_state(FAULT);
-    
-    printf("Error: %s\r\n", ERROR_NAMES[_error]);
-    
     // Cause of error
     error = _error;
 }
@@ -121,11 +79,11 @@ void report_fault(error_t _error) {
 volatile uint8_t switches = 0;
 
 uint8_t is_hv_requested() {
-    return switches & 0b10;//IO_RB2_GetValue();
+    return switches & 0b10;
 }
 
 uint8_t is_drive_requested() {
-    return switches & 0b1;//IO_RB7_GetValue();
+    return switches & 0b1;
 }
 
 
@@ -301,23 +259,6 @@ uint16_t capacitor_volt = 0;
 
 /************ CAN ************/
 
-typedef enum {
-    VEHICLE_STATE = 0x0c0,
-    DRIVER_SWITCHES = 0x0d0,
-    TORQUE_REQUEST_COMMAND = 0x766,
-    BRAKE_COMMAND = 0x767,
-    BMS_STATUS_MSG = 0x380,
-    PEI_CURRENT = 0x387,
-    BMS_VOLTAGES = 0x388,
-    BMS_TEMPERATURES = 0x389,
-    MC_ESTOP = 0x366,
-    MC_DEBUG = 0x466,
-    MC_PDO_SEND = 0x566,
-    MC_PDO_ACK = 0x666
-} CAN_ID;
-
-CAN_MSG_OBJ msg_RX;
-
 void can_receive() {
     // gets message and updates values
     if (CAN1_Receive(&msg_RX)) {
@@ -359,6 +300,9 @@ unsigned int discrepancy_timer_ms = 0;
 
 // runs every 10ms; used for precharge timeout and sensor discrepancy
 void ten_ms_timer_ISR() {
+    // CAN receive done here to dodge 50ms delay in main()
+    can_receive();
+    
     if (state == PRECHARGING) {
         precharge_timer_ms += TMR1_PERIOD_MS;
         if (precharge_timer_ms > PRECHARGE_TIMEOUT_MS) {
@@ -405,60 +349,20 @@ int main(void)
         // Main FSM
         // Source: https://docs.google.com/document/d/1q0RL4FmDfVuAp6xp9yW7O-vIvnkwoAXWssC3-vBmNGM/edit?usp=sharing
         
-        // CAN receive
-        can_receive();
-       
         // CAN transmit state
-        CAN_MSG_OBJ msg_TX_state;
-        
-        CAN_MSG_FIELD field_TX_state; 
-        field_TX_state.dlc = 1; 
-        field_TX_state.idType = 0;
-        field_TX_state.formatType = 0; 
-        field_TX_state.frameType = 0;
-        field_TX_state.brs = 0; 
-        
         uint8_t data_TX_state[1] = {state}; 
         if (state == FAULT) { 
             data_TX_state[0] = 0b10000000 + error; // greatest bit = 1 if fault 
         }
         
-        msg_TX_state.field = field_TX_state; 
+        msg_TX_state.field = field_TX_state;
         msg_TX_state.data = data_TX_state;
-        msg_TX_state.msgId = VEHICLE_STATE;
         CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_state);
         
-        //__delay_ms(50);
+        __delay_ms(25);
         
-        // CAN transmit brake command
-        CAN_MSG_OBJ msg_TX_brake;
-        
-        CAN_MSG_FIELD field_TX_brake; 
-        field_TX_brake.dlc = 1; 
-        field_TX_brake.idType = 0;
-        field_TX_brake.formatType = 0; 
-        field_TX_brake.frameType = 0; 
-        field_TX_brake.brs = 0; 
-        
-        uint8_t data_TX_brake[1] = {brake}; 
-        
-        msg_TX_brake.field = field_TX_brake; 
-        msg_TX_brake.data = data_TX_brake;
-        msg_TX_brake.msgId = BRAKE_COMMAND;
-        CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_brake);
-        
-        //__delay_ms(50);
-        
-        //  CAN transmit torque request command 
-        CAN_MSG_OBJ msg_TX_torque;
-
-        CAN_MSG_FIELD field_TX_torque; 
-        field_TX_torque.dlc = 5;//3; 
-        field_TX_torque.idType = 0;
-        field_TX_torque.formatType = 0; 
-        field_TX_torque.frameType = 0; 
-        field_TX_torque.brs = 0;
-
+        //  CAN transmit torque request command
+        // CURRENTLY APPS VALUES FOR DEBUG
         uint8_t data_TX_torque[5] = {
             is_hv_requested(),
             (uint8_t)(throttle1 >> 8),
@@ -468,14 +372,22 @@ int main(void)
 //            (uint16_t)(throttle1 * THROTTLE_MULTIPLIER) >> 8, // torque request upper
 //            (uint16_t)(throttle1 * THROTTLE_MULTIPLIER) & 0xff // torque request lower
         };
-
+        
         msg_TX_torque.field = field_TX_torque; 
-        msg_TX_torque.msgId = TORQUE_REQUEST_COMMAND;
         msg_TX_torque.data = data_TX_torque;
-
         CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_torque);
         
-        //__delay_ms(50);
+        __delay_ms(25);
+        
+        
+        // CAN transmit brake command
+        uint8_t data_TX_brake[1] = {brake}; 
+         
+        msg_TX_brake.field = field_TX_brake; 
+        msg_TX_brake.data = data_TX_brake;
+        CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_brake);
+        
+        __delay_ms(25);
 
         switch (state) {
             case LV:

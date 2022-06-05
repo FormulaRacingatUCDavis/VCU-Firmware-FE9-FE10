@@ -26,6 +26,8 @@
         <itemPath>mcc_generated_files/adc1.h</itemPath>
         <itemPath>mcc_generated_files/adc_module_features.h</itemPath>
       </logicalFolder>
+      <itemPath>can_manager.h</itemPath>
+      <itemPath>fsm.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -52,7 +54,7 @@
       </logicalFolder>
       <itemPath>main.c</itemPath>
       <itemPath>can_manager.c</itemPath>
-      <itemPath>can_manager.h</itemPath>
+      <itemPath>fsm.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
