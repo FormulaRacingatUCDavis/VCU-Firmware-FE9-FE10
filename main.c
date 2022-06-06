@@ -46,6 +46,19 @@
 #include "can_manager.h"
 #include "fsm.h"
 
+
+/************ Timer ************/
+
+// How long to wait for pre-charging to finish before timing out
+#define PRECHARGE_TIMEOUT_MS 5000
+// Keeps track of timer waiting for pre-charging
+unsigned int precharge_timer_ms = 0;
+// Delay between checking pre-charging state
+#define TMR1_PERIOD_MS 10
+// discrepancy timer
+#define MAX_DISCREPANCY_MS 100 
+unsigned int discrepancy_timer_ms = 0;
+
 /************ States ************/
 
 void change_state(const state_t new_state) {
@@ -78,11 +91,11 @@ void report_fault(error_t _error) {
  */
 volatile uint8_t switches = 0;
 
-uint8_t is_hv_requested() {
+uint8_t hv_switch() {
     return switches & 0b10;
 }
 
-uint8_t is_drive_requested() {
+uint8_t drive_switch() {
     return switches & 0b1;
 }
 
@@ -107,15 +120,16 @@ void temp_attenuate() {
     }
 }
 
-uint16_t throttle1 = 0;
-uint16_t throttle2 = 0;
+volatile uint16_t throttle_sent = 0;
+volatile uint16_t throttle1 = 0;
+volatile uint16_t throttle2 = 0;
+volatile uint16_t per_throttle1 = 0;
+volatile uint16_t per_throttle2 = 0;
 uint16_t throttle1_max = 0;
 uint16_t throttle1_min = 0x7FFF;
 uint16_t throttle2_max = 0;
 uint16_t throttle2_min = 0x7FFF;
 uint16_t throttle_range = 0; // set after max and min values are calibrated
-uint16_t per_throttle1 = 0;
-uint16_t per_throttle2 = 0;
 
 
 // Brake
@@ -124,7 +138,7 @@ uint16_t per_throttle2 = 0;
 // So give some room for error when driver presses on brake
 #define BRAKE_ERROR_TOLERANCE 50
 
-uint16_t brake = 0;
+volatile uint16_t brake = 0;
 uint16_t brake_max = 0;
 uint16_t brake_min = 0x7FFF;
 uint16_t brake_range = 0;
@@ -171,8 +185,9 @@ bool brake_implausible() {
     temp_brake = (uint16_t)((temp_brake-brake_min)*100.0 / brake_range);
     
     
-    if (state == FAULT && error == BRAKE_IMPLAUSIBLE) {
-        // once brake implausibility detected, can only revert to normal if throttle unapplied
+    if (error == BRAKE_IMPLAUSIBLE) {
+        // once brake implausibility detected,
+        // can only revert to normal if throttle unapplied
         return !(temp_throttle < throttle_range * 0.05);
     }
     else {
@@ -230,11 +245,13 @@ void run_calibration() {
     if (brake < brake_min) {
         brake_min = brake;
     }
+    throttle_range = throttle1_max - throttle1_min;
+    brake_range = brake_max - brake_min;
 }
 
 // storage variables used to return to previous state when discrepancy is resolved
-state_t temp_state = LV; // state before sensor discrepancy error
-error_t temp_error = NONE; // error state before sensor discrepancy error (only used when going from one fault to discrepancy fault)
+volatile state_t temp_state = LV; // state before sensor discrepancy error
+volatile error_t temp_error = NONE; // error state before sensor discrepancy error (only used when going from one fault to discrepancy fault)
 
 void update_sensor_vals() {
     // APPS1 = pin8 = RA0
@@ -245,16 +262,31 @@ void update_sensor_vals() {
     // BSE2 = pin12 = RA4
     brake = getConversion(BSE1);
 
-//    if (error != SENSOR_DISCREPANCY && has_discrepancy() ) {
-//        temp_state = state;
-//        temp_error = error;
-//        report_fault(SENSOR_DISCREPANCY);
-//    }
+    /* 
+     * T.4.2.5 in FSAE 2022 rulebook
+     * If an implausibility occurs between the values of the APPSs and
+     * persists for more than 100 msec, the power to the Motor(s) must
+     * be immediately stopped completely.
+     * 
+     * It is not necessary to Open the Shutdown Circuit, the motor
+     * controller(s) stopping the power to the Motor(s) is sufficient.
+     */
+    if (has_discrepancy()) {
+        discrepancy_timer_ms += TMR1_PERIOD_MS;
+        if (discrepancy_timer_ms > MAX_DISCREPANCY_MS && state == DRIVE) {
+            // ***** UNCOMMENT WHEN PEDALS WORK *****
+            temp_state = state;
+            temp_error = error;
+            report_fault(SENSOR_DISCREPANCY);
+        }
+    } else {
+        discrepancy_timer_ms = 0;
+    }
 }
 
 /************ Capacitor ************/
 
-uint16_t capacitor_volt = 0;
+volatile uint16_t capacitor_volt = 0;
 #define PRECHARGE_THRESHOLD 5806 // 90% of accumulator voltage, scaled from range of 0-12800(0V-200V)
 
 /************ CAN ************/
@@ -288,19 +320,9 @@ void can_receive() {
 
 /************ Timer ************/
 
-// How long to wait for pre-charging to finish before timing out
-#define PRECHARGE_TIMEOUT_MS 5000
-// Keeps track of timer waiting for pre-charging
-unsigned int precharge_timer_ms = 0;
-// Delay between checking pre-charging state
-#define TMR1_PERIOD_MS 10
-// discrepancy timer
-#define MAX_DISCREPANCY_MS 100 
-unsigned int discrepancy_timer_ms = 0;
-
 // runs every 10ms; used for precharge timeout and sensor discrepancy
 void ten_ms_timer_ISR() {
-    // CAN receive done here to dodge 50ms delay in main()
+    // CAN receive done here to dodge __delay_ms() latency in main()
     can_receive();
     
     if (state == PRECHARGING) {
@@ -310,15 +332,7 @@ void ten_ms_timer_ISR() {
         }
     } else {
         precharge_timer_ms = 0;
-    }
-    if (has_discrepancy()) {
-        discrepancy_timer_ms += TMR1_PERIOD_MS;
-        if (discrepancy_timer_ms > MAX_DISCREPANCY_MS) {
-            // ***** UNCOMMENT WHEN PEDALS WORK *****
-            //report_fault(SENSOR_DISCREPANCY);
-        }
-    }
-        
+    }   
 }
 
 /*
@@ -349,63 +363,66 @@ int main(void)
         // Main FSM
         // Source: https://docs.google.com/document/d/1q0RL4FmDfVuAp6xp9yW7O-vIvnkwoAXWssC3-vBmNGM/edit?usp=sharing
         
+        update_sensor_vals();
+        
         // CAN transmit state
-        uint8_t data_TX_state[1] = {state}; 
+        data_TX_state[0] = state; 
         if (state == FAULT) { 
             data_TX_state[0] = 0b10000000 + error; // greatest bit = 1 if fault 
         }
         
         msg_TX_state.field = field_TX_state;
-        msg_TX_state.data = data_TX_state;
         CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_state);
         
-        __delay_ms(25);
+        __delay_ms(50);
         
         //  CAN transmit torque request command
+        hv_requested = (state == PRECHARGING)
+                    || (state == HV_ENABLED)
+                    || (state == DRIVE)
+                    || (error == BRAKE_NOT_PRESSED)
+                    || (error == BRAKE_IMPLAUSIBLE);
+        if (state == DRIVE) {
+            throttle_sent = throttle1 * THROTTLE_MULTIPLIER;
+        } else {
+            throttle_sent = 0;
+        }
         // CURRENTLY APPS VALUES FOR DEBUG
         uint8_t data_TX_torque[5] = {
-            is_hv_requested(),
+            hv_requested,
             (uint8_t)(throttle1 >> 8),
             throttle1 & 0xff,
             (uint8_t)(throttle2 >> 8),
             throttle2 & 0xff
-//            (uint16_t)(throttle1 * THROTTLE_MULTIPLIER) >> 8, // torque request upper
-//            (uint16_t)(throttle1 * THROTTLE_MULTIPLIER) & 0xff // torque request lower
+//            (uint16_t)(throttle_sent) >> 8, // torque request upper
+//            (uint16_t)(throttle_sent) & 0xff // torque request lower
         };
         
         msg_TX_torque.field = field_TX_torque; 
         msg_TX_torque.data = data_TX_torque;
         CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_torque);
         
-        __delay_ms(25);
-        
+        __delay_ms(50);
         
         // CAN transmit brake command
-        uint8_t data_TX_brake[1] = {brake}; 
-         
-        msg_TX_brake.field = field_TX_brake; 
-        msg_TX_brake.data = data_TX_brake;
+        data_TX_brake[0] = (brake >= ((brake_range)/6));
+        msg_TX_brake.field = field_TX_brake;
         CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_brake);
         
-        __delay_ms(25);
+        __delay_ms(50);
 
         switch (state) {
             case LV:
                 run_calibration();
                 
-                if (is_drive_requested()) {
+                if (drive_switch()) {
                     // Drive switch should not be enabled during LV
                     report_fault(DRIVE_REQUEST_FROM_LV);
                     break;
                 }
 
-                if (is_hv_requested()) {
+                if (hv_switch()) {
                     // HV switch was flipped
-                    
-                    // Set throttle and brake range since calibration is done
-                    throttle_range = throttle1_max - throttle1_min;
-                    brake_range = brake_max - brake_min; // idk where this is even used
-                    
                     // Start charging the car to high voltage state
                     change_state(PRECHARGING);
                 } 
@@ -417,22 +434,25 @@ int main(void)
                     change_state(HV_ENABLED);
                     break;
                 }
-                if (!is_hv_requested()) {
+                if (!hv_switch()) {
                     // Driver flipped off HV switch
                     change_state(LV);
                     break;
                 }
+                if (drive_switch()) {
+                    // Drive switch should not be enabled during PRECHARGING
+                    report_fault(DRIVE_REQUEST_FROM_LV);
+                    break;
+                }
                 break;
             case HV_ENABLED:
-                update_sensor_vals();
-
-                if (!is_hv_requested() || capacitor_volt < PRECHARGE_THRESHOLD) {
+                if (!hv_switch() || capacitor_volt < PRECHARGE_THRESHOLD) {
                     // Driver flipped off HV switch
                     change_state(LV);
                     break;
                 }
                 
-                if (is_drive_requested()) {
+                if (drive_switch()) {
                     // Driver flipped on drive switch
                     // Need to press on pedal at the same time to go to drive
                     if (brake >= PEDAL_MAX - BRAKE_ERROR_TOLERANCE) {
@@ -447,14 +467,14 @@ int main(void)
             case DRIVE:
                 update_sensor_vals();
 
-                if (!is_drive_requested()) {
+                if (!drive_switch()) {
                     // Drive switch was flipped off
                     // Revert to HV
                     change_state(HV_ENABLED);
                    break;
                 }
 
-                if (!is_hv_requested()) {
+                if (!hv_switch()) {
                     // HV switched flipped off, so can't drive
                     report_fault(HV_DISABLED_WHILE_DRIVING);
                     break;
@@ -468,64 +488,50 @@ int main(void)
             case FAULT:
                 switch (error) {
                     case DRIVE_REQUEST_FROM_LV:
-                        if (!is_drive_requested()) {
+                        if (!hv_switch() && !drive_switch()) {
                             // Drive switch was flipped off
                             // Revert to LV
                             change_state(LV);
                         }
                         break;
                     case CONSERVATIVE_TIMER_MAXED:
-                        if (!is_hv_requested() && !is_drive_requested()) {
+                        if (!hv_switch() && !drive_switch()) {
                             // Drive and HV switch must both be reset
                             // to revert to LV
                             change_state(LV);
                         }
                         break;
                     case BRAKE_NOT_PRESSED:
-                        if (!is_drive_requested()) {
+                        if (!drive_switch()) {
                             // Ask driver to reset drive switch and try again
                             change_state(HV_ENABLED);
                         }
                         break;
                     case HV_DISABLED_WHILE_DRIVING:
-                        update_sensor_vals();
-
-                        if (!is_drive_requested()) {
+                        if (!drive_switch()) {
                             // Ask driver to flip off drive switch to properly go back to LV
                             change_state(LV);
                         }
                         break;
                     case SENSOR_DISCREPANCY:
-                        update_sensor_vals();
-                        
                         // stop power to motors if discrepancy persists for >100ms
                         // see rule T.4.2.5 in FSAE 2022 rulebook
-                        if (discrepancy_timer_ms > MAX_DISCREPANCY_MS) {
+                        if (!drive_switch()) {
+                            // Drive and HV switch must both be reset
+                            // to revert to LV
                             discrepancy_timer_ms = 0;
-                            change_state(LV);
-                        }
-
-                        if (!has_discrepancy()) {
-                            discrepancy_timer_ms = 0;
-                            // if discrepancy resolved, change back to previous state
-                            if (temp_state == FAULT) {
-                                report_fault(temp_error);
-                            } else {
-                                change_state(temp_state);
-                            }
+                            change_state(HV_ENABLED);
                         }
                         //__delay_ms(TMR1_PERIOD_MS);
                         discrepancy_timer_ms += TMR1_PERIOD_MS;
                         
                         break;
                     case BRAKE_IMPLAUSIBLE:
-                        update_sensor_vals();
-
                         if (!brake_implausible()) {
                             change_state(DRIVE);
                         }
                     case ESTOP:
-                        if (!is_hv_requested() && !is_drive_requested()) {
+                        if (!hv_switch() && !drive_switch()) {
                             change_state(LV);
                         }
                 }

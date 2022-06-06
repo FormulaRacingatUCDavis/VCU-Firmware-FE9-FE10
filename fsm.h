@@ -41,5 +41,8 @@ typedef enum {
 } error_t;
 
 // Initial FSM state
-state_t state = LV;
-error_t error = NONE;
+volatile state_t state = LV;
+volatile error_t error = NONE;
+
+// true if state/error should be requesting HV
+volatile uint8_t hv_requested = 0;

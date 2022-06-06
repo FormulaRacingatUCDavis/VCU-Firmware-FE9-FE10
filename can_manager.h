@@ -43,6 +43,7 @@ CAN_MSG_OBJ msg_RX;
 /********** OUTGOING CAN MESSAGES **********/
 
 // vehicle state
+uint8_t data_TX_state[1];
 CAN_MSG_FIELD field_TX_state = {
     .idType = 0,
     .frameType = 0,
@@ -52,25 +53,12 @@ CAN_MSG_FIELD field_TX_state = {
 };
 CAN_MSG_OBJ msg_TX_state = {
     .msgId = VEHICLE_STATE,
-    .field = 0, // null
-    .data = 0 // null pointer
-};
-
-// brake command
-CAN_MSG_FIELD field_TX_brake = {
-    .idType = 0,
-    .frameType = 0,
-    .dlc = 1,
-    .formatType = 0,
-    .brs = 0
-};
-CAN_MSG_OBJ msg_TX_brake = {
-    .msgId = BRAKE_COMMAND,
-    .field = 0, // null
-    .data = 0 // null pointer
+    .field = {0}, // null
+    .data = data_TX_state // null pointer
 };
 
 // torque request command
+//uint8_t data_TX_torque[5];
 CAN_MSG_FIELD field_TX_torque = {
     .idType = 0,
     .frameType = 0,
@@ -80,6 +68,21 @@ CAN_MSG_FIELD field_TX_torque = {
 };
 CAN_MSG_OBJ msg_TX_torque = {
     .msgId = TORQUE_REQUEST_COMMAND,
-    .field = 0, // null
+    .field = {0}, // null
     .data = 0 // null pointer
+};
+
+// brake command
+uint8_t data_TX_brake[1];
+CAN_MSG_FIELD field_TX_brake = {
+    .idType = 0,
+    .frameType = 0,
+    .dlc = 1,
+    .formatType = 0,
+    .brs = 0
+};
+CAN_MSG_OBJ msg_TX_brake = {
+    .msgId = BRAKE_COMMAND,
+    .field = {0}, // null
+    .data = data_TX_brake // null pointer
 };
