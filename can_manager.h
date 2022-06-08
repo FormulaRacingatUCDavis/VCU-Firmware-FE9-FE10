@@ -58,11 +58,11 @@ CAN_MSG_OBJ msg_TX_state = {
 };
 
 // torque request command
-//uint8_t data_TX_torque[5];
+//uint8_t data_TX_torque[4];
 CAN_MSG_FIELD field_TX_torque = {
     .idType = 0,
     .frameType = 0,
-    .dlc = 5,
+    .dlc = 4,
     .formatType = 0,
     .brs = 0
 };
@@ -86,3 +86,5 @@ CAN_MSG_OBJ msg_TX_brake = {
     .field = {0}, // null
     .data = data_TX_brake // null pointer
 };
+
+void can_receive();

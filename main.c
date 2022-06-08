@@ -99,12 +99,11 @@ uint8_t drive_switch() {
     return switches & 0b1;
 }
 
-
 /************ Pedals ************/
 
 // APPS
 
-volatile double THROTTLE_MULTIPLIER;
+volatile double THROTTLE_MULTIPLIER = 1;
 volatile uint8_t PACK_TEMP;
 
 const double THROTTLE_MAP[8] = { 95, 71, 59, 47, 35, 23, 11, 5 };
@@ -120,7 +119,7 @@ void temp_attenuate() {
     }
 }
 
-volatile uint16_t throttle_sent = 0;
+volatile uint32_t throttle_sent = 0;
 volatile uint16_t throttle1 = 0;
 volatile uint16_t throttle2 = 0;
 volatile uint16_t per_throttle1 = 0;
@@ -172,7 +171,7 @@ bool has_discrepancy() {
 // check for soft BSPD
 // see EV.5.7 of FSAE 2022 rulebook
 bool brake_implausible() {
-    uint16_t temp_throttle = throttle1; 
+    uint16_t temp_throttle = throttle1 - throttle1_min; 
     
     // subtract dead zone 15%
     uint16_t temp_brake = brake - ((brake_range)/6);
@@ -210,7 +209,6 @@ uint16_t getConversion(ADC1_CHANNEL channel){
     ADC1_Disable();
     return conversion;
 }
-
 
 // Update sensors
 
@@ -294,7 +292,6 @@ volatile uint16_t capacitor_volt = 0;
 void can_receive() {
     // gets message and updates values
     if (CAN1_Receive(&msg_RX)) {
-        INDICATOR_1_Toggle();
         switch (msg_RX.msgId) {
             case DRIVER_SWITCHES:
                 switches = msg_RX.data[0]; 
@@ -308,7 +305,6 @@ void can_receive() {
                     report_fault(ESTOP);
                 }
             case MC_PDO_ACK:
-                INDICATOR_2_Toggle();
                 capacitor_volt = (msg_RX.data[0] << 8); // upper bits
                 capacitor_volt += msg_RX.data[1]; // lower bits
             default:
@@ -381,21 +377,35 @@ int main(void)
                     || (state == HV_ENABLED)
                     || (state == DRIVE)
                     || (error == BRAKE_NOT_PRESSED)
+                    || (error == SENSOR_DISCREPANCY)
                     || (error == BRAKE_IMPLAUSIBLE);
         if (state == DRIVE) {
-            throttle_sent = throttle1 * THROTTLE_MULTIPLIER;
+            // check bounds
+            if (throttle1 > throttle1_max) {
+                throttle1 = throttle1_max;
+            } else if (throttle1 < throttle1_min) {
+                throttle1 = throttle1_min;
+            }
+            throttle_sent = (uint32_t)(throttle1 - throttle1_min);
+            throttle_sent = (throttle_sent * 0x7fff) / throttle_range;
+            throttle_sent = (uint32_t)(throttle_sent * THROTTLE_MULTIPLIER);
         } else {
             throttle_sent = 0;
         }
-        // CURRENTLY APPS VALUES FOR DEBUG
-        uint8_t data_TX_torque[5] = {
+        // APPS VALUES FOR DEBUG
+//        uint8_t data_TX_torque[4] = {
+//            (uint8_t)(throttle1 >> 8),
+//            0,//throttle1 & 0xff,
+//            (uint8_t)(throttle2 >> 8),
+//            0//throttle2 & 0xff
+//        };
+        
+        // ACTUAL TORQUE_REQUEST_COMMAND
+        uint8_t data_TX_torque[4] = {
             hv_requested,
-            (uint8_t)(throttle1 >> 8),
-            throttle1 & 0xff,
-            (uint8_t)(throttle2 >> 8),
-            throttle2 & 0xff
-//            (uint16_t)(throttle_sent) >> 8, // torque request upper
-//            (uint16_t)(throttle_sent) & 0xff // torque request lower
+            (uint8_t)(throttle_sent >> 8), // torque request upper
+            (uint8_t)(throttle_sent & 0xff), // torque request lower
+            (error != ESTOP)
         };
         
         msg_TX_torque.field = field_TX_torque; 
@@ -455,7 +465,9 @@ int main(void)
                 if (drive_switch()) {
                     // Driver flipped on drive switch
                     // Need to press on pedal at the same time to go to drive
-                    if (brake >= PEDAL_MAX - BRAKE_ERROR_TOLERANCE) {
+                    
+                    // ***** UNCOMMENT WHEN PEDALS WORK *****
+                    if (1) {//brake >= PEDAL_MAX - BRAKE_ERROR_TOLERANCE) {
                         change_state(DRIVE);                        
                     } else {
                         // Driver didn't press pedal
@@ -465,8 +477,6 @@ int main(void)
                 
                 break;
             case DRIVE:
-                update_sensor_vals();
-
                 if (!drive_switch()) {
                     // Drive switch was flipped off
                     // Revert to HV
@@ -474,15 +484,17 @@ int main(void)
                    break;
                 }
 
-                if (!hv_switch()) {
+                if (!hv_switch() || capacitor_volt < PRECHARGE_THRESHOLD) {
                     // HV switched flipped off, so can't drive
+                    // or capacitor dropped below threshold
                     report_fault(HV_DISABLED_WHILE_DRIVING);
                     break;
                 }
-
-                if (brake_implausible()) {
-                    report_fault(BRAKE_IMPLAUSIBLE);
-                }
+        
+                // ***** UNCOMMENT WHEN PEDALS WORK *****
+//                if (brake_implausible()) {
+//                    report_fault(BRAKE_IMPLAUSIBLE);
+//                }
                 
                 break;
             case FAULT:
@@ -496,20 +508,17 @@ int main(void)
                         break;
                     case CONSERVATIVE_TIMER_MAXED:
                         if (!hv_switch() && !drive_switch()) {
-                            // Drive and HV switch must both be reset
-                            // to revert to LV
                             change_state(LV);
                         }
                         break;
                     case BRAKE_NOT_PRESSED:
                         if (!drive_switch()) {
-                            // Ask driver to reset drive switch and try again
+                            // reset drive switch and try again
                             change_state(HV_ENABLED);
                         }
                         break;
                     case HV_DISABLED_WHILE_DRIVING:
-                        if (!drive_switch()) {
-                            // Ask driver to flip off drive switch to properly go back to LV
+                        if (!hv_switch() && !drive_switch()) {
                             change_state(LV);
                         }
                         break;
@@ -517,18 +526,20 @@ int main(void)
                         // stop power to motors if discrepancy persists for >100ms
                         // see rule T.4.2.5 in FSAE 2022 rulebook
                         if (!drive_switch()) {
-                            // Drive and HV switch must both be reset
-                            // to revert to LV
                             discrepancy_timer_ms = 0;
                             change_state(HV_ENABLED);
                         }
-                        //__delay_ms(TMR1_PERIOD_MS);
-                        discrepancy_timer_ms += TMR1_PERIOD_MS;
-                        
                         break;
                     case BRAKE_IMPLAUSIBLE:
-                        if (!brake_implausible()) {
+                        if (!brake_implausible() && hv_switch() && drive_switch()) {
                             change_state(DRIVE);
+                        }
+                        if (!hv_switch() && !drive_switch()) {
+                            change_state(LV);
+                        }
+                        
+                        if (!drive_switch()) {
+                            change_state(HV_ENABLED);
                         }
                     case ESTOP:
                         if (!hv_switch() && !drive_switch()) {
