@@ -22,6 +22,7 @@ extern "C" {
 /********** ENUM OF CAN IDS **********/
 typedef enum {
     VEHICLE_STATE = 0x0c0,
+    BSPD_FLAGS = 0x0c1,
     DRIVER_SWITCHES = 0x0d0,
     TORQUE_REQUEST_COMMAND = 0x766,
     BRAKE_COMMAND = 0x767,
@@ -42,27 +43,12 @@ CAN_MSG_OBJ msg_RX;
 
 /********** OUTGOING CAN MESSAGES **********/
 
-// vehicle state
-uint8_t data_TX_state[1];
-CAN_MSG_FIELD field_TX_state = {
-    .idType = 0,
-    .frameType = 0,
-    .dlc = 1,
-    .formatType = 0,
-    .brs = 0
-};
-CAN_MSG_OBJ msg_TX_state = {
-    .msgId = VEHICLE_STATE,
-    .field = {0}, // null
-    .data = data_TX_state // null pointer
-};
-
 // torque request command
 //uint8_t data_TX_torque[4];
 CAN_MSG_FIELD field_TX_torque = {
     .idType = 0,
     .frameType = 0,
-    .dlc = 4,
+    .dlc = 6,
     .formatType = 0,
     .brs = 0
 };
@@ -72,19 +58,19 @@ CAN_MSG_OBJ msg_TX_torque = {
     .data = 0 // null pointer
 };
 
-// brake command
-uint8_t data_TX_brake[1];
-CAN_MSG_FIELD field_TX_brake = {
+// BSPD flags + pedal ADC
+//uint8_t data_TX_bspd_flags[6];
+CAN_MSG_FIELD field_TX_bspd_flags = {
     .idType = 0,
     .frameType = 0,
-    .dlc = 1,
+    .dlc = 6,
     .formatType = 0,
     .brs = 0
 };
-CAN_MSG_OBJ msg_TX_brake = {
-    .msgId = BRAKE_COMMAND,
+CAN_MSG_OBJ msg_TX_bspd_flags = {
+    .msgId = BSPD_FLAGS,
     .field = {0}, // null
-    .data = data_TX_brake // null pointer
+    .data = 0 // null pointer
 };
 
 void can_receive();

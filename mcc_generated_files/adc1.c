@@ -55,8 +55,10 @@
 static void (*ADC1_CommonDefaultInterruptHandler)(void);
 static void (*ADC1_APPS1DefaultInterruptHandler)(uint16_t adcVal);
 static void (*ADC1_APPS2DefaultInterruptHandler)(uint16_t adcVal);
+static void (*ADC1_CURRENT_DIGITALISHDefaultInterruptHandler)(uint16_t adcVal);
 static void (*ADC1_BSE1DefaultInterruptHandler)(uint16_t adcVal);
 static void (*ADC1_BSE2DefaultInterruptHandler)(uint16_t adcVal);
+static void (*ADC1_B_THRESHDefaultInterruptHandler)(uint16_t adcVal);
 static void (*ADC1_channel_AN16DefaultInterruptHandler)(uint16_t adcVal);
 static void (*ADC1_channel_AN17DefaultInterruptHandler)(uint16_t adcVal);
 static void (*ADC1_channel_AN18DefaultInterruptHandler)(uint16_t adcVal);
@@ -154,8 +156,10 @@ void ADC1_Initialize (void)
     ADC1_SetCommonInterruptHandler(&ADC1_CallBack);
     ADC1_SetAPPS1InterruptHandler(&ADC1_APPS1_CallBack);
     ADC1_SetAPPS2InterruptHandler(&ADC1_APPS2_CallBack);
+    ADC1_SetCURRENT_DIGITALISHInterruptHandler(&ADC1_CURRENT_DIGITALISH_CallBack);
     ADC1_SetBSE1InterruptHandler(&ADC1_BSE1_CallBack);
     ADC1_SetBSE2InterruptHandler(&ADC1_BSE2_CallBack);
+    ADC1_SetB_THRESHInterruptHandler(&ADC1_B_THRESH_CallBack);
     ADC1_Setchannel_AN16InterruptHandler(&ADC1_channel_AN16_CallBack);
     ADC1_Setchannel_AN17InterruptHandler(&ADC1_channel_AN17_CallBack);
     ADC1_Setchannel_AN18InterruptHandler(&ADC1_channel_AN18_CallBack);
@@ -192,16 +196,16 @@ void ADC1_Initialize (void)
 
     //TRGSRC0 Common Software Trigger; TRGSRC1 Common Software Trigger; 
     ADTRIG0L = 0x101;
-    //TRGSRC3 Common Software Trigger; TRGSRC2 None; 
-    ADTRIG0H = 0x100;
+    //TRGSRC3 Common Software Trigger; TRGSRC2 Common Software Trigger; 
+    ADTRIG0H = 0x101;
     //TRGSRC4 Common Software Trigger; TRGSRC5 None; 
     ADTRIG1L = 0x01;
     //TRGSRC6 None; TRGSRC7 None; 
     ADTRIG1H = 0x00;
     //TRGSRC8 None; TRGSRC9 None; 
     ADTRIG2L = 0x00;
-    //TRGSRC11 None; TRGSRC10 None; 
-    ADTRIG2H = 0x00;
+    //TRGSRC11 Common Software Trigger; TRGSRC10 None; 
+    ADTRIG2H = 0x100;
     //TRGSRC13 None; TRGSRC12 None; 
     ADTRIG3L = 0x00;
     //TRGSRC15 None; TRGSRC14 None; 
@@ -298,6 +302,32 @@ void __attribute__ ((weak)) ADC1_APPS2_Tasks ( void )
     }
 }
 
+void __attribute__ ((weak)) ADC1_CURRENT_DIGITALISH_CallBack( uint16_t adcVal )
+{ 
+
+}
+
+void ADC1_SetCURRENT_DIGITALISHInterruptHandler(void* handler)
+{
+    ADC1_CURRENT_DIGITALISHDefaultInterruptHandler = handler;
+}
+
+void __attribute__ ((weak)) ADC1_CURRENT_DIGITALISH_Tasks ( void )
+{
+    uint16_t valCURRENT_DIGITALISH;
+
+    if(ADSTATLbits.AN2RDY)
+    {
+        //Read the ADC value from the ADCBUF
+        valCURRENT_DIGITALISH = ADCBUF2;
+
+        if(ADC1_CURRENT_DIGITALISHDefaultInterruptHandler) 
+        { 
+            ADC1_CURRENT_DIGITALISHDefaultInterruptHandler(valCURRENT_DIGITALISH); 
+        }
+    }
+}
+
 void __attribute__ ((weak)) ADC1_BSE1_CallBack( uint16_t adcVal )
 { 
 
@@ -346,6 +376,32 @@ void __attribute__ ((weak)) ADC1_BSE2_Tasks ( void )
         if(ADC1_BSE2DefaultInterruptHandler) 
         { 
             ADC1_BSE2DefaultInterruptHandler(valBSE2); 
+        }
+    }
+}
+
+void __attribute__ ((weak)) ADC1_B_THRESH_CallBack( uint16_t adcVal )
+{ 
+
+}
+
+void ADC1_SetB_THRESHInterruptHandler(void* handler)
+{
+    ADC1_B_THRESHDefaultInterruptHandler = handler;
+}
+
+void __attribute__ ((weak)) ADC1_B_THRESH_Tasks ( void )
+{
+    uint16_t valB_THRESH;
+
+    if(ADSTATLbits.AN11RDY)
+    {
+        //Read the ADC value from the ADCBUF
+        valB_THRESH = ADCBUF11;
+
+        if(ADC1_B_THRESHDefaultInterruptHandler) 
+        { 
+            ADC1_B_THRESHDefaultInterruptHandler(valB_THRESH); 
         }
     }
 }

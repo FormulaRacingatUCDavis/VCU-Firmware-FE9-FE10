@@ -43,6 +43,8 @@ typedef enum {
 // Initial FSM state
 volatile state_t state = LV;
 volatile error_t error = NONE;
+// 8-bit encoding of state to be put on CAN
+volatile uint8_t state_msg_byte = LV;
 
 // true if state/error should be requesting HV
 volatile uint8_t hv_requested = 0;

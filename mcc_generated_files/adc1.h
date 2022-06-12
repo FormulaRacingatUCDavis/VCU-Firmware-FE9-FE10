@@ -92,8 +92,10 @@ typedef enum
 {
     APPS1,//Channel Name:AN0   Assigned to:Shared Channel
     APPS2,//Channel Name:AN1   Assigned to:Shared Channel
+    CURRENT_DIGITALISH,//Channel Name:AN2   Assigned to:Shared Channel
     BSE1,//Channel Name:AN3   Assigned to:Shared Channel
     BSE2,//Channel Name:AN4   Assigned to:Shared Channel
+    B_THRESH,//Channel Name:AN11   Assigned to:Shared Channel
     channel_AN16,//Channel Name:AN16   Assigned to:Shared Channel
     channel_AN17,//Channel Name:AN17   Assigned to:Shared Channel
     channel_AN18,//Channel Name:AN18   Assigned to:Shared Channel
@@ -395,11 +397,17 @@ inline static uint16_t ADC1_ConversionResultGet( ADC1_CHANNEL channel )
         case APPS2:
                 result = ADCBUF1;
                 break;
+        case CURRENT_DIGITALISH:
+                result = ADCBUF2;
+                break;
         case BSE1:
                 result = ADCBUF3;
                 break;
         case BSE2:
                 result = ADCBUF4;
+                break;
+        case B_THRESH:
+                result = ADCBUF11;
                 break;
         case channel_AN16:
                 result = ADCBUF16;
@@ -471,11 +479,17 @@ inline static bool ADC1_IsConversionComplete(ADC1_CHANNEL channel)
         case APPS2:
                 status = ADSTATLbits.AN1RDY;
                 break;
+        case CURRENT_DIGITALISH:
+                status = ADSTATLbits.AN2RDY;
+                break;
         case BSE1:
                 status = ADSTATLbits.AN3RDY;
                 break;
         case BSE2:
                 status = ADSTATLbits.AN4RDY;
+                break;
+        case B_THRESH:
+                status = ADSTATLbits.AN11RDY;
                 break;
         case channel_AN16:
                 status = ADSTATHbits.AN16RDY;
@@ -708,11 +722,17 @@ inline static void ADC1_IndividualChannelInterruptEnable(ADC1_CHANNEL channel)
         case APPS2:
                 IEC5bits.ADCAN1IE = 1;
                 break;
+        case CURRENT_DIGITALISH:
+                IEC5bits.ADCAN2IE = 1;
+                break;
         case BSE1:
                 IEC5bits.ADCAN3IE = 1;
                 break;
         case BSE2:
                 IEC5bits.ADCAN4IE = 1;
+                break;
+        case B_THRESH:
+                IEC6bits.ADCAN11IE = 1;
                 break;
         case channel_AN16:
                 IEC6bits.ADCAN16IE = 1;
@@ -766,11 +786,17 @@ inline static void ADC1_IndividualChannelInterruptDisable(ADC1_CHANNEL channel)
         case APPS2:
                 IEC5bits.ADCAN1IE = 0;
                 break;
+        case CURRENT_DIGITALISH:
+                IEC5bits.ADCAN2IE = 0;
+                break;
         case BSE1:
                 IEC5bits.ADCAN3IE = 0;
                 break;
         case BSE2:
                 IEC5bits.ADCAN4IE = 0;
+                break;
+        case B_THRESH:
+                IEC6bits.ADCAN11IE = 0;
                 break;
         case channel_AN16:
                 IEC6bits.ADCAN16IE = 0;
@@ -823,11 +849,17 @@ inline static void ADC1_IndividualChannelInterruptFlagClear(ADC1_CHANNEL channel
         case APPS2:
                 IFS5bits.ADCAN1IF = 0;
                 break;
+        case CURRENT_DIGITALISH:
+                IFS5bits.ADCAN2IF = 0;
+                break;
         case BSE1:
                 IFS5bits.ADCAN3IF = 0;
                 break;
         case BSE2:
                 IFS5bits.ADCAN4IF = 0;
+                break;
+        case B_THRESH:
+                IFS6bits.ADCAN11IF = 0;
                 break;
         case channel_AN16:
                 IFS6bits.ADCAN16IF = 0;
@@ -991,6 +1023,76 @@ void ADC1_APPS2_Tasks(void);
 
 /**
   @Summary
+    ADC1 CURRENT_DIGITALISH callback routine.
+
+  @Description
+    This routine is a ADC1 CURRENT_DIGITALISH callback function.
+  
+  @Preconditions
+    None.
+
+  @Param
+    None.
+
+  @Returns
+    None
+ 
+  @Example 
+    <code>
+        ADC1_SetCURRENT_DIGITALISHInterruptHandler(&ADC1_CURRENT_DIGITALISH_CallBack);
+    </code>
+*/
+void ADC1_CURRENT_DIGITALISH_CallBack(uint16_t adcVal);
+
+/**
+  @Summary
+    Assigns a function pointer with a ADC1 CURRENT_DIGITALISH callback address.
+
+  @Description
+    This routine assigns a function pointer with a ADC1 CURRENT_DIGITALISH callback address.
+  
+  @Preconditions
+    None.
+
+  @Param
+    Address of the callback routine.
+
+  @Returns
+    None
+ 
+  @Example 
+    <code>
+        ADC1_SetCURRENT_DIGITALISHInterruptHandler(&ADC1_CURRENT_DIGITALISH_CallBack);
+    </code>
+*/
+void ADC1_SetCURRENT_DIGITALISHInterruptHandler(void* handler);
+
+/**
+  @Summary
+    Polled implementation
+
+  @Description
+    This routine is used to implement the tasks for ADC1 CURRENT_DIGITALISH polled implementations.
+  
+  @Preconditions
+    ADC1_Initialize() function should have been 
+    called before calling this function.
+ 
+  @Param
+    None
+
+  @Returns 
+    None
+ 
+  @Example
+    <code>    
+        ADC1_CURRENT_DIGITALISH_Tasks();
+    </code>
+*/
+void ADC1_CURRENT_DIGITALISH_Tasks(void);
+
+/**
+  @Summary
     ADC1 BSE1 callback routine.
 
   @Description
@@ -1128,6 +1230,76 @@ void ADC1_SetBSE2InterruptHandler(void* handler);
     </code>
 */
 void ADC1_BSE2_Tasks(void);
+
+/**
+  @Summary
+    ADC1 B_THRESH callback routine.
+
+  @Description
+    This routine is a ADC1 B_THRESH callback function.
+  
+  @Preconditions
+    None.
+
+  @Param
+    None.
+
+  @Returns
+    None
+ 
+  @Example 
+    <code>
+        ADC1_SetB_THRESHInterruptHandler(&ADC1_B_THRESH_CallBack);
+    </code>
+*/
+void ADC1_B_THRESH_CallBack(uint16_t adcVal);
+
+/**
+  @Summary
+    Assigns a function pointer with a ADC1 B_THRESH callback address.
+
+  @Description
+    This routine assigns a function pointer with a ADC1 B_THRESH callback address.
+  
+  @Preconditions
+    None.
+
+  @Param
+    Address of the callback routine.
+
+  @Returns
+    None
+ 
+  @Example 
+    <code>
+        ADC1_SetB_THRESHInterruptHandler(&ADC1_B_THRESH_CallBack);
+    </code>
+*/
+void ADC1_SetB_THRESHInterruptHandler(void* handler);
+
+/**
+  @Summary
+    Polled implementation
+
+  @Description
+    This routine is used to implement the tasks for ADC1 B_THRESH polled implementations.
+  
+  @Preconditions
+    ADC1_Initialize() function should have been 
+    called before calling this function.
+ 
+  @Param
+    None
+
+  @Returns 
+    None
+ 
+  @Example
+    <code>    
+        ADC1_B_THRESH_Tasks();
+    </code>
+*/
+void ADC1_B_THRESH_Tasks(void);
 
 /**
   @Summary
@@ -1639,6 +1811,61 @@ inline static bool __attribute__((deprecated("\nThis will be removed in future M
 }
 /**
   @Summary
+    Returns the ADC1 conversion value for the shared core channel AN2
+
+  @Description
+    This routine is used to get the analog to digital converted value for channel AN2. This
+    routine gets converted values from the shared core channel AN2.
+ 
+  @Preconditions
+    The shared core must be enabled and calibrated before calling this routine 
+    using ADC1_SharedCorePowerEnable() and ADC1_SharedCoreCalibration() 
+    respectively. This routine returns the conversion value only after the 
+    conversion is complete. Completion status conversion can be checked using 
+    ADC1_IsSharedChannelAN2ConversionComplete() routine.
+   
+  @Returns
+    Returns the buffer containing the conversion value.
+
+  @Param
+    Buffer address
+  
+  @Example
+    Refer to ADC1_Initialize(); for an example
+ */
+inline static uint16_t __attribute__((deprecated("\nThis will be removed in future MCC releases."))) ADC1_SharedChannelAN2ConversionResultGet(void) 
+{
+    return ADCBUF2;
+}
+/**
+  @Summary
+    Returns the conversion status of shared channel AN2 selected for conversion
+
+  @Description
+    This routine is used to return the conversion status of the shared channel AN2 
+    selected for conversion.
+  
+  @Preconditions
+    ADC1_Initialize() function should have been 
+    called before calling this function.
+ 
+  @Returns
+    The value of the Channel AN2 Conversion register
+
+  @Param
+    None
+  
+  @Example
+    Refer to ADC1_Initialize(); for an example
+ 
+*/
+
+inline static bool __attribute__((deprecated("\nThis will be removed in future MCC releases."))) ADC1_IsSharedChannelAN2ConversionComplete(void)
+{   
+    return ADSTATLbits.AN2RDY;
+}
+/**
+  @Summary
     Returns the ADC1 conversion value for the shared core channel AN3
 
   @Description
@@ -1746,6 +1973,61 @@ inline static uint16_t __attribute__((deprecated("\nThis will be removed in futu
 inline static bool __attribute__((deprecated("\nThis will be removed in future MCC releases."))) ADC1_IsSharedChannelAN4ConversionComplete(void)
 {   
     return ADSTATLbits.AN4RDY;
+}
+/**
+  @Summary
+    Returns the ADC1 conversion value for the shared core channel AN11
+
+  @Description
+    This routine is used to get the analog to digital converted value for channel AN11. This
+    routine gets converted values from the shared core channel AN11.
+ 
+  @Preconditions
+    The shared core must be enabled and calibrated before calling this routine 
+    using ADC1_SharedCorePowerEnable() and ADC1_SharedCoreCalibration() 
+    respectively. This routine returns the conversion value only after the 
+    conversion is complete. Completion status conversion can be checked using 
+    ADC1_IsSharedChannelAN11ConversionComplete() routine.
+   
+  @Returns
+    Returns the buffer containing the conversion value.
+
+  @Param
+    Buffer address
+  
+  @Example
+    Refer to ADC1_Initialize(); for an example
+ */
+inline static uint16_t __attribute__((deprecated("\nThis will be removed in future MCC releases."))) ADC1_SharedChannelAN11ConversionResultGet(void) 
+{
+    return ADCBUF11;
+}
+/**
+  @Summary
+    Returns the conversion status of shared channel AN11 selected for conversion
+
+  @Description
+    This routine is used to return the conversion status of the shared channel AN11 
+    selected for conversion.
+  
+  @Preconditions
+    ADC1_Initialize() function should have been 
+    called before calling this function.
+ 
+  @Returns
+    The value of the Channel AN11 Conversion register
+
+  @Param
+    None
+  
+  @Example
+    Refer to ADC1_Initialize(); for an example
+ 
+*/
+
+inline static bool __attribute__((deprecated("\nThis will be removed in future MCC releases."))) ADC1_IsSharedChannelAN11ConversionComplete(void)
+{   
+    return ADSTATLbits.AN11RDY;
 }
 
 #ifdef __cplusplus  // Provide C++ Compatibility

@@ -54,7 +54,7 @@
 // Keeps track of timer waiting for pre-charging
 unsigned int precharge_timer_ms = 0;
 // Delay between checking pre-charging state
-#define TMR1_PERIOD_MS 10
+#define TMR1_PERIOD_MS 20
 // discrepancy timer
 #define MAX_DISCREPANCY_MS 100 
 unsigned int discrepancy_timer_ms = 0;
@@ -285,7 +285,7 @@ void update_sensor_vals() {
 /************ Capacitor ************/
 
 volatile uint16_t capacitor_volt = 0;
-#define PRECHARGE_THRESHOLD 5806 // 90% of accumulator voltage, scaled from range of 0-12800(0V-200V)
+#define PRECHARGE_THRESHOLD 4976 // 77V = 90% of nominal accumulator voltage, scaled from range of 0-12800(0V-200V)
 
 /************ CAN ************/
 
@@ -304,7 +304,7 @@ void can_receive() {
                 if (msg_RX.data[0]) { // if estop detected in any state
                     report_fault(ESTOP);
                 }
-            case MC_PDO_ACK:
+            case MC_PDO_SEND:
                 capacitor_volt = (msg_RX.data[0] << 8); // upper bits
                 capacitor_volt += msg_RX.data[1]; // lower bits
             default:
@@ -316,8 +316,8 @@ void can_receive() {
 
 /************ Timer ************/
 
-// runs every 10ms; used for precharge timeout and sensor discrepancy
-void ten_ms_timer_ISR() {
+// runs every 20ms; used for precharge timeout and sensor discrepancy
+void tmr1_ISR() {
     // CAN receive done here to dodge __delay_ms() latency in main()
     can_receive();
     
@@ -352,26 +352,19 @@ int main(void)
     }
     
     // Set up timer interrupt
-    TMR1_SetInterruptHandler(ten_ms_timer_ISR);
+    TMR1_SetInterruptHandler(tmr1_ISR);
     TMR1_Start();
     
     while (1) {
         // Main FSM
         // Source: https://docs.google.com/document/d/1q0RL4FmDfVuAp6xp9yW7O-vIvnkwoAXWssC3-vBmNGM/edit?usp=sharing
         
-        update_sensor_vals();
-        
         // CAN transmit state
-        data_TX_state[0] = state; 
+        state_msg_byte = state; 
         if (state == FAULT) { 
-            data_TX_state[0] = 0b10000000 + error; // greatest bit = 1 if fault 
+            state_msg_byte = 0b10000000 + error; // greatest bit = 1 if fault 
         }
-        
-        msg_TX_state.field = field_TX_state;
-        CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_state);
-        
-        __delay_ms(50);
-        
+
         //  CAN transmit torque request command
         hv_requested = (state == PRECHARGING)
                     || (state == HV_ENABLED)
@@ -379,6 +372,7 @@ int main(void)
                     || (error == BRAKE_NOT_PRESSED)
                     || (error == SENSOR_DISCREPANCY)
                     || (error == BRAKE_IMPLAUSIBLE);
+        update_sensor_vals();
         if (state == DRIVE) {
             // check bounds
             if (throttle1 > throttle1_max) {
@@ -392,35 +386,40 @@ int main(void)
         } else {
             throttle_sent = 0;
         }
-        // APPS VALUES FOR DEBUG
-//        uint8_t data_TX_torque[4] = {
-//            (uint8_t)(throttle1 >> 8),
-//            0,//throttle1 & 0xff,
-//            (uint8_t)(throttle2 >> 8),
-//            0//throttle2 & 0xff
-//        };
-        
-        // ACTUAL TORQUE_REQUEST_COMMAND
-        uint8_t data_TX_torque[4] = {
+        uint8_t data_TX_torque[6] = {
             hv_requested,
             (uint8_t)(throttle_sent >> 8), // torque request upper
             (uint8_t)(throttle_sent & 0xff), // torque request lower
-            (error != ESTOP)
+            (error != ESTOP),
+            state_msg_byte,
+            (brake >= ((brake_range)/6))
         };
-        
+
         msg_TX_torque.field = field_TX_torque; 
         msg_TX_torque.data = data_TX_torque;
         CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_torque);
+//        __delay_ms(50);
+//        
+//        // CAN transmit BSPD flags (DEBUG)
+//        uint8_t data_TX_bspd_flags[6] = {
+//            BSPD_LATCH_GetValue() << 5,
+//            (uint8_t)(throttle1 >> 8), // throttle1 upper
+//            (uint8_t)(throttle2 >> 8), // throttle2 upper
+//            (uint8_t)(brake >> 8), // brake1 upper
+//            0//(uint8_t)(brake2 >> 8), // brake2 upper
+//        };
+//        data_TX_bspd_flags[0] |= BSPD_TRIPPED_GetValue() << 4;
+//        data_TX_bspd_flags[0] |= OPEN_SHORT_OK_GetValue() << 3;
+//        data_TX_bspd_flags[0] |= B_OR_5K_TRIPPED_GetValue() << 2;
+//        data_TX_bspd_flags[0] |= B_TRIPPED_GetValue() << 1;
+//        data_TX_bspd_flags[0] |= K5_TRIPPED_GetValue();
+//                
+//        msg_TX_bspd_flags.field = field_TX_bspd_flags; 
+//        msg_TX_bspd_flags.data = data_TX_bspd_flags;
+//        CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_bspd_flags);
+//        
+//        __delay_ms(50);
         
-        __delay_ms(50);
-        
-        // CAN transmit brake command
-        data_TX_brake[0] = (brake >= ((brake_range)/6));
-        msg_TX_brake.field = field_TX_brake;
-        CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_brake);
-        
-        __delay_ms(50);
-
         switch (state) {
             case LV:
                 run_calibration();
@@ -433,8 +432,14 @@ int main(void)
 
                 if (hv_switch()) {
                     // HV switch was flipped
-                    // Start charging the car to high voltage state
-                    change_state(PRECHARGING);
+                    // check if APPS pedal was calibrated
+                    if (throttle_range > 0xD00) {
+                        // Start charging the car to high voltage state
+                        change_state(PRECHARGING);
+                    } else {
+                        // ***** RENAME TO "UNCALIBRATED" *****
+                        report_fault(DRIVE_REQUEST_FROM_LV);
+                    }
                 } 
                 
                 break;
@@ -456,7 +461,7 @@ int main(void)
                 }
                 break;
             case HV_ENABLED:
-                if (!hv_switch() || capacitor_volt < PRECHARGE_THRESHOLD) {
+                if (!hv_switch()) {// || capacitor_volt < PRECHARGE_THRESHOLD) { // don't really need volt check by rules
                     // Driver flipped off HV switch
                     change_state(LV);
                     break;

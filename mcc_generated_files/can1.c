@@ -661,10 +661,10 @@ static void CAN1_RX_FIFO_FilterMaskConfiguration(void)
 */
 static void CAN1_BitRateConfiguration(void)
 {
-    // SJW 31; TSEG2 31; 
-    C1NBTCFGL = 0x1F1F;
-    // BRP 0; TSEG1 126; 
-    C1NBTCFGH = 0x7E;
+    // SJW 1; TSEG2 1; 
+    C1NBTCFGL = 0x101;
+    // BRP 19; TSEG1 4; 
+    C1NBTCFGH = 0x1304;
 }
 
 /**
