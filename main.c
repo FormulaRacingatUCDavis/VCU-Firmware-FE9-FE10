@@ -489,7 +489,7 @@ int main(void)
                    break;
                 }
 
-                if (!hv_switch() || capacitor_volt < PRECHARGE_THRESHOLD) {
+                if (!hv_switch()) {// || capacitor_volt < PRECHARGE_THRESHOLD) { // don't really need volt check by rules || capacitor_volt < PRECHARGE_THRESHOLD) {
                     // HV switched flipped off, so can't drive
                     // or capacitor dropped below threshold
                     report_fault(HV_DISABLED_WHILE_DRIVING);

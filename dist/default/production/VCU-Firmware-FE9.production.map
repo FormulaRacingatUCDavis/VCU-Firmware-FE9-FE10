@@ -149,14 +149,14 @@ section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
 .text                        0x200               0xba0          0x1170  (4464)
 .const                       0xda0                0x2a            0x3f  (63)
-.text                        0xdca              0x1850          0x2478  (9336)
-.dinit                      0x261a                0x5e            0x8d  (141)
-.text                       0x2678                0x7c            0xba  (186)
-.init.delay32               0x26f4                0x1c            0x2a  (42)
-.text                       0x2710                0x18            0x24  (36)
-data_init_dualch.S.scn1     0x2728                 0x2             0x3  (3)
+.text                        0xdca              0x1848          0x246c  (9324)
+.dinit                      0x2612                0x5e            0x8d  (141)
+.text                       0x2670                0x7c            0xba  (186)
+.init.delay32               0x26ec                0x1c            0x2a  (42)
+.text                       0x2708                0x18            0x24  (36)
+data_init_dualch.S.scn1     0x2720                 0x2             0x3  (3)
 
-                 Total "program" memory used (bytes):         0x37bf  (14271) 5%
+                 Total "program" memory used (bytes):         0x37b3  (14259) 5%
 
 
 "data" Memory  [Origin = 0x1000, Length = 0x8000]
@@ -342,72 +342,72 @@ External Symbols in Program Memory (by address):
                   0x001b3c                  _can_receive
                   0x001bd2                  _tmr1_ISR
                   0x001bf6                  _main
-                  0x001e8a                  _ADC1_Initialize
-                  0x001f60                  _ADC1_SharedCorePowerEnable
-                  0x001f7c                  _ADC1_SetCommonInterruptHandler
-                  0x001fac                  _ADC1_SetAPPS1InterruptHandler
-                  0x001fde                  _ADC1_SetAPPS2InterruptHandler
-                  0x002010                  _ADC1_SetCURRENT_DIGITALISHInterruptHandler
-                  0x002042                  _ADC1_SetBSE1InterruptHandler
-                  0x002074                  _ADC1_SetBSE2InterruptHandler
-                  0x0020a6                  _ADC1_SetB_THRESHInterruptHandler
-                  0x0020da                  _ADC1_Setchannel_AN16InterruptHandler
-                  0x0020ee                  _ADC1_Setchannel_AN17InterruptHandler
-                  0x002102                  _ADC1_Setchannel_AN18InterruptHandler
-                  0x002116                  _ADC1_Setchannel_AN19InterruptHandler
-                  0x00212a                  _ADC1_Setchannel_AN20InterruptHandler
-                  0x002136                  _RESET_GetCause
-                  0x00225a                  _RESET_CauseClearAll
-                  0x002270                  _CAN2_Initialize
-                  0x002292                  _CAN2_OperationModeSet
-                  0x0022fa                  _CAN2_OperationModeGet
-                  0x002308                  _CAN2_IsBusOff
-                  0x002320                  _CAN2_Sleep
-                  0x00234e                  _CAN2_Tasks
-                  0x00238a                  _UART1_Initialize
-                  0x0023ba                  _UART1_Read
-                  0x0023d8                  _UART1_Write
-                  0x0023ee                  _UART1_IsRxReady
-                  0x002402                  _UART1_IsTxReady
-                  0x002422                  _UART1_IsTxDone
-                  0x00243a                  _UART1_StatusGet
-                  0x002454                  _UART1_Enable
-                  0x002460                  _UART1_Disable
-                  0x00246c                  _TMR1_Initialize
-                  0x002490                  _TMR1_Period16BitSet
-                  0x0024a2                  _TMR1_Period16BitGet
-                  0x0024aa                  _TMR1_Counter16BitSet
-                  0x0024bc                  _TMR1_Counter16BitGet
-                  0x0024ca                  _TMR1_SetInterruptHandler
-                  0x0024da                  _TMR1_Start
-                  0x0024ea                  _TMR1_Stop
-                  0x0024f4                  _TMR1_GetElapsedThenClear
-                  0x00250c                  _TMR1_SoftwareCounterGet
-                  0x002518                  _TMR1_SoftwareCounterClear
-                  0x002524                  _PIN_MANAGER_Initialize
-                  0x0025ac                  _CLOCK_Initialize
-                  0x002602                  _CLOCK_AuxPllLockStatusGet
-                  0x002678                  _INTERRUPT_Initialize
-                  0x0026d8                  _SYSTEM_Initialize
-                  0x0026f4                  ___delay32
+                  0x001e82                  _ADC1_Initialize
+                  0x001f58                  _ADC1_SharedCorePowerEnable
+                  0x001f74                  _ADC1_SetCommonInterruptHandler
+                  0x001fa4                  _ADC1_SetAPPS1InterruptHandler
+                  0x001fd6                  _ADC1_SetAPPS2InterruptHandler
+                  0x002008                  _ADC1_SetCURRENT_DIGITALISHInterruptHandler
+                  0x00203a                  _ADC1_SetBSE1InterruptHandler
+                  0x00206c                  _ADC1_SetBSE2InterruptHandler
+                  0x00209e                  _ADC1_SetB_THRESHInterruptHandler
+                  0x0020d2                  _ADC1_Setchannel_AN16InterruptHandler
+                  0x0020e6                  _ADC1_Setchannel_AN17InterruptHandler
+                  0x0020fa                  _ADC1_Setchannel_AN18InterruptHandler
+                  0x00210e                  _ADC1_Setchannel_AN19InterruptHandler
+                  0x002122                  _ADC1_Setchannel_AN20InterruptHandler
+                  0x00212e                  _RESET_GetCause
+                  0x002252                  _RESET_CauseClearAll
+                  0x002268                  _CAN2_Initialize
+                  0x00228a                  _CAN2_OperationModeSet
+                  0x0022f2                  _CAN2_OperationModeGet
+                  0x002300                  _CAN2_IsBusOff
+                  0x002318                  _CAN2_Sleep
+                  0x002346                  _CAN2_Tasks
+                  0x002382                  _UART1_Initialize
+                  0x0023b2                  _UART1_Read
+                  0x0023d0                  _UART1_Write
+                  0x0023e6                  _UART1_IsRxReady
+                  0x0023fa                  _UART1_IsTxReady
+                  0x00241a                  _UART1_IsTxDone
+                  0x002432                  _UART1_StatusGet
+                  0x00244c                  _UART1_Enable
+                  0x002458                  _UART1_Disable
+                  0x002464                  _TMR1_Initialize
+                  0x002488                  _TMR1_Period16BitSet
+                  0x00249a                  _TMR1_Period16BitGet
+                  0x0024a2                  _TMR1_Counter16BitSet
+                  0x0024b4                  _TMR1_Counter16BitGet
+                  0x0024c2                  _TMR1_SetInterruptHandler
+                  0x0024d2                  _TMR1_Start
+                  0x0024e2                  _TMR1_Stop
+                  0x0024ec                  _TMR1_GetElapsedThenClear
+                  0x002504                  _TMR1_SoftwareCounterGet
+                  0x002510                  _TMR1_SoftwareCounterClear
+                  0x00251c                  _PIN_MANAGER_Initialize
+                  0x0025a4                  _CLOCK_Initialize
+                  0x0025fa                  _CLOCK_AuxPllLockStatusGet
+                  0x002670                  _INTERRUPT_Initialize
+                  0x0026d0                  _SYSTEM_Initialize
+                  0x0026ec                  ___delay32
                   0x02bf00                  __FSEC.sec
 
 External Symbols in Program Memory (by name):
 
-                  0x001e8a                  _ADC1_Initialize
-                  0x001fac                  _ADC1_SetAPPS1InterruptHandler
-                  0x001fde                  _ADC1_SetAPPS2InterruptHandler
-                  0x002042                  _ADC1_SetBSE1InterruptHandler
-                  0x002074                  _ADC1_SetBSE2InterruptHandler
-                  0x0020a6                  _ADC1_SetB_THRESHInterruptHandler
-                  0x002010                  _ADC1_SetCURRENT_DIGITALISHInterruptHandler
-                  0x001f7c                  _ADC1_SetCommonInterruptHandler
-                  0x0020da                  _ADC1_Setchannel_AN16InterruptHandler
-                  0x0020ee                  _ADC1_Setchannel_AN17InterruptHandler
-                  0x002102                  _ADC1_Setchannel_AN18InterruptHandler
-                  0x002116                  _ADC1_Setchannel_AN19InterruptHandler
-                  0x00212a                  _ADC1_Setchannel_AN20InterruptHandler
-                  0x001f60                  _ADC1_SharedCorePowerEnable
+                  0x001e82                  _ADC1_Initialize
+                  0x001fa4                  _ADC1_SetAPPS1InterruptHandler
+                  0x001fd6                  _ADC1_SetAPPS2InterruptHandler
+                  0x00203a                  _ADC1_SetBSE1InterruptHandler
+                  0x00206c                  _ADC1_SetBSE2InterruptHandler
+                  0x00209e                  _ADC1_SetB_THRESHInterruptHandler
+                  0x002008                  _ADC1_SetCURRENT_DIGITALISHInterruptHandler
+                  0x001f74                  _ADC1_SetCommonInterruptHandler
+                  0x0020d2                  _ADC1_Setchannel_AN16InterruptHandler
+                  0x0020e6                  _ADC1_Setchannel_AN17InterruptHandler
+                  0x0020fa                  _ADC1_Setchannel_AN18InterruptHandler
+                  0x00210e                  _ADC1_Setchannel_AN19InterruptHandler
+                  0x002122                  _ADC1_Setchannel_AN20InterruptHandler
+                  0x001f58                  _ADC1_SharedCorePowerEnable
                   0x00123c                  _CAN1_Initialize
                   0x00155c                  _CAN1_IsBusOff
                   0x0015a4                  _CAN1_IsRxErrorActive
@@ -424,40 +424,40 @@ External Symbols in Program Memory (by name):
                   0x001646                  _CAN1_Tasks
                   0x0013a6                  _CAN1_Transmit
                   0x001440                  _CAN1_TransmitFIFOStatusGet
-                  0x002270                  _CAN2_Initialize
-                  0x002308                  _CAN2_IsBusOff
-                  0x0022fa                  _CAN2_OperationModeGet
-                  0x002292                  _CAN2_OperationModeSet
-                  0x002320                  _CAN2_Sleep
-                  0x00234e                  _CAN2_Tasks
-                  0x002602                  _CLOCK_AuxPllLockStatusGet
-                  0x0025ac                  _CLOCK_Initialize
-                  0x002678                  _INTERRUPT_Initialize
-                  0x002524                  _PIN_MANAGER_Initialize
-                  0x00225a                  _RESET_CauseClearAll
-                  0x002136                  _RESET_GetCause
-                  0x0026d8                  _SYSTEM_Initialize
+                  0x002268                  _CAN2_Initialize
+                  0x002300                  _CAN2_IsBusOff
+                  0x0022f2                  _CAN2_OperationModeGet
+                  0x00228a                  _CAN2_OperationModeSet
+                  0x002318                  _CAN2_Sleep
+                  0x002346                  _CAN2_Tasks
+                  0x0025fa                  _CLOCK_AuxPllLockStatusGet
+                  0x0025a4                  _CLOCK_Initialize
+                  0x002670                  _INTERRUPT_Initialize
+                  0x00251c                  _PIN_MANAGER_Initialize
+                  0x002252                  _RESET_CauseClearAll
+                  0x00212e                  _RESET_GetCause
+                  0x0026d0                  _SYSTEM_Initialize
                   0x000da0                  _THROTTLE_MAP
-                  0x0024bc                  _TMR1_Counter16BitGet
-                  0x0024aa                  _TMR1_Counter16BitSet
-                  0x0024f4                  _TMR1_GetElapsedThenClear
-                  0x00246c                  _TMR1_Initialize
-                  0x0024a2                  _TMR1_Period16BitGet
-                  0x002490                  _TMR1_Period16BitSet
-                  0x0024ca                  _TMR1_SetInterruptHandler
-                  0x002518                  _TMR1_SoftwareCounterClear
-                  0x00250c                  _TMR1_SoftwareCounterGet
-                  0x0024da                  _TMR1_Start
-                  0x0024ea                  _TMR1_Stop
-                  0x002460                  _UART1_Disable
-                  0x002454                  _UART1_Enable
-                  0x00238a                  _UART1_Initialize
-                  0x0023ee                  _UART1_IsRxReady
-                  0x002422                  _UART1_IsTxDone
-                  0x002402                  _UART1_IsTxReady
-                  0x0023ba                  _UART1_Read
-                  0x00243a                  _UART1_StatusGet
-                  0x0023d8                  _UART1_Write
+                  0x0024b4                  _TMR1_Counter16BitGet
+                  0x0024a2                  _TMR1_Counter16BitSet
+                  0x0024ec                  _TMR1_GetElapsedThenClear
+                  0x002464                  _TMR1_Initialize
+                  0x00249a                  _TMR1_Period16BitGet
+                  0x002488                  _TMR1_Period16BitSet
+                  0x0024c2                  _TMR1_SetInterruptHandler
+                  0x002510                  _TMR1_SoftwareCounterClear
+                  0x002504                  _TMR1_SoftwareCounterGet
+                  0x0024d2                  _TMR1_Start
+                  0x0024e2                  _TMR1_Stop
+                  0x002458                  _UART1_Disable
+                  0x00244c                  _UART1_Enable
+                  0x002382                  _UART1_Initialize
+                  0x0023e6                  _UART1_IsRxReady
+                  0x00241a                  _UART1_IsTxDone
+                  0x0023fa                  _UART1_IsTxReady
+                  0x0023b2                  _UART1_Read
+                  0x002432                  _UART1_StatusGet
+                  0x0023d0                  _UART1_Write
                   0x000410                  __AddressError
                   0x0004e4                  __C1Interrupt
                   0x0004ba                  __C2Interrupt
@@ -469,7 +469,7 @@ External Symbols in Program Memory (by name):
                   0x000470                  __SoftTrapError
                   0x0003ee                  __StackError
                   0x00050e                  __T1Interrupt
-                  0x0026f4                  ___delay32
+                  0x0026ec                  ___delay32
                   0x000702                  ___divsf3
                   0x000702                  ___divsf3x
                   0x000676                  ___eqsf2
@@ -4826,7 +4826,7 @@ _0x1093ecd2062a531f1
                     0x8da0                  _THROTTLE_MAP
  .const             0x8dc0          0xa build/default/production/mcc_generated_files/can1.o
 
-.text             0x000dca       0x1850
+.text             0x000dca       0x1848
  .text            0x000dca        0x8d0 build/default/production/mcc_generated_files/can1.o
                   0x00123c                  _CAN1_Initialize
                   0x00126a                  _CAN1_OperationModeSet
@@ -4851,7 +4851,7 @@ _0x1093ecd2062a531f1
                   0x00163a                  _CAN1_DefaultTxAttemptHandler
                   0x001640                  _CAN1_DefaultRxBufferOverFlowHandler
                   0x001646                  _CAN1_Tasks
- .text            0x00169a        0x7f0 build/default/production/main.o
+ .text            0x00169a        0x7e8 build/default/production/main.o
                   0x00184c                  _change_state
                   0x001866                  _report_fault
                   0x001876                  _hv_switch
@@ -4865,103 +4865,103 @@ _0x1093ecd2062a531f1
                   0x001b3c                  _can_receive
                   0x001bd2                  _tmr1_ISR
                   0x001bf6                  _main
- .text            0x001e8a        0x2ac build/default/production/mcc_generated_files/adc1.o
-                  0x001e8a                  _ADC1_Initialize
-                  0x001f60                  _ADC1_SharedCorePowerEnable
-                  0x001f76                  _ADC1_CallBack
-                  0x001f7c                  _ADC1_SetCommonInterruptHandler
-                  0x001f88                  _ADC1_Tasks
-                  0x001fa4                  _ADC1_APPS1_CallBack
-                  0x001fac                  _ADC1_SetAPPS1InterruptHandler
-                  0x001fb8                  _ADC1_APPS1_Tasks
-                  0x001fd6                  _ADC1_APPS2_CallBack
-                  0x001fde                  _ADC1_SetAPPS2InterruptHandler
-                  0x001fea                  _ADC1_APPS2_Tasks
-                  0x002008                  _ADC1_CURRENT_DIGITALISH_CallBack
-                  0x002010                  _ADC1_SetCURRENT_DIGITALISHInterruptHandler
-                  0x00201c                  _ADC1_CURRENT_DIGITALISH_Tasks
-                  0x00203a                  _ADC1_BSE1_CallBack
-                  0x002042                  _ADC1_SetBSE1InterruptHandler
-                  0x00204e                  _ADC1_BSE1_Tasks
-                  0x00206c                  _ADC1_BSE2_CallBack
-                  0x002074                  _ADC1_SetBSE2InterruptHandler
-                  0x002080                  _ADC1_BSE2_Tasks
-                  0x00209e                  _ADC1_B_THRESH_CallBack
-                  0x0020a6                  _ADC1_SetB_THRESHInterruptHandler
-                  0x0020b2                  _ADC1_B_THRESH_Tasks
-                  0x0020d2                  _ADC1_channel_AN16_CallBack
-                  0x0020da                  _ADC1_Setchannel_AN16InterruptHandler
-                  0x0020e6                  _ADC1_channel_AN17_CallBack
-                  0x0020ee                  _ADC1_Setchannel_AN17InterruptHandler
-                  0x0020fa                  _ADC1_channel_AN18_CallBack
-                  0x002102                  _ADC1_Setchannel_AN18InterruptHandler
-                  0x00210e                  _ADC1_channel_AN19_CallBack
-                  0x002116                  _ADC1_Setchannel_AN19InterruptHandler
-                  0x002122                  _ADC1_channel_AN20_CallBack
-                  0x00212a                  _ADC1_Setchannel_AN20InterruptHandler
- .text            0x002136        0x12c build/default/production/mcc_generated_files/reset.o
-                  0x002136                  _RESET_GetCause
-                  0x00213e                  _RESET_CauseHandler
-                  0x00225a                  _RESET_CauseClearAll
- .text            0x002262        0x128 build/default/production/mcc_generated_files/can2.o
-                  0x002270                  _CAN2_Initialize
-                  0x002292                  _CAN2_OperationModeSet
-                  0x0022fa                  _CAN2_OperationModeGet
-                  0x002308                  _CAN2_IsBusOff
-                  0x002320                  _CAN2_Sleep
-                  0x002330                  _CAN2_DefaultInvalidMessageHandler
-                  0x002336                  _CAN2_DefaultBusWakeUpActivityHandler
-                  0x00233c                  _CAN2_DefaultBusErrorHandler
-                  0x002342                  _CAN2_DefaultModeChangeHandler
-                  0x002348                  _CAN2_DefaultSystemErrorHandler
-                  0x00234e                  _CAN2_Tasks
- .text            0x00238a         0xe2 build/default/production/mcc_generated_files/uart1.o
-                  0x00238a                  _UART1_Initialize
-                  0x0023ba                  _UART1_Read
-                  0x0023d8                  _UART1_Write
-                  0x0023ee                  _UART1_IsRxReady
-                  0x002402                  _UART1_IsTxReady
-                  0x002422                  _UART1_IsTxDone
-                  0x00243a                  _UART1_StatusGet
-                  0x002454                  _UART1_Enable
-                  0x002460                  _UART1_Disable
- .text            0x00246c         0xb8 build/default/production/mcc_generated_files/tmr1.o
-                  0x00246c                  _TMR1_Initialize
-                  0x002490                  _TMR1_Period16BitSet
-                  0x0024a2                  _TMR1_Period16BitGet
-                  0x0024aa                  _TMR1_Counter16BitSet
-                  0x0024bc                  _TMR1_Counter16BitGet
-                  0x0024c4                  _TMR1_CallBack
-                  0x0024ca                  _TMR1_SetInterruptHandler
-                  0x0024da                  _TMR1_Start
-                  0x0024ea                  _TMR1_Stop
-                  0x0024f4                  _TMR1_GetElapsedThenClear
-                  0x00250c                  _TMR1_SoftwareCounterGet
-                  0x002518                  _TMR1_SoftwareCounterClear
- .text            0x002524         0x88 build/default/production/mcc_generated_files/pin_manager.o
-                  0x002524                  _PIN_MANAGER_Initialize
- .text            0x0025ac         0x6e build/default/production/mcc_generated_files/clock.o
-                  0x0025ac                  _CLOCK_Initialize
-                  0x002602                  _CLOCK_AuxPllLockStatusGet
+ .text            0x001e82        0x2ac build/default/production/mcc_generated_files/adc1.o
+                  0x001e82                  _ADC1_Initialize
+                  0x001f58                  _ADC1_SharedCorePowerEnable
+                  0x001f6e                  _ADC1_CallBack
+                  0x001f74                  _ADC1_SetCommonInterruptHandler
+                  0x001f80                  _ADC1_Tasks
+                  0x001f9c                  _ADC1_APPS1_CallBack
+                  0x001fa4                  _ADC1_SetAPPS1InterruptHandler
+                  0x001fb0                  _ADC1_APPS1_Tasks
+                  0x001fce                  _ADC1_APPS2_CallBack
+                  0x001fd6                  _ADC1_SetAPPS2InterruptHandler
+                  0x001fe2                  _ADC1_APPS2_Tasks
+                  0x002000                  _ADC1_CURRENT_DIGITALISH_CallBack
+                  0x002008                  _ADC1_SetCURRENT_DIGITALISHInterruptHandler
+                  0x002014                  _ADC1_CURRENT_DIGITALISH_Tasks
+                  0x002032                  _ADC1_BSE1_CallBack
+                  0x00203a                  _ADC1_SetBSE1InterruptHandler
+                  0x002046                  _ADC1_BSE1_Tasks
+                  0x002064                  _ADC1_BSE2_CallBack
+                  0x00206c                  _ADC1_SetBSE2InterruptHandler
+                  0x002078                  _ADC1_BSE2_Tasks
+                  0x002096                  _ADC1_B_THRESH_CallBack
+                  0x00209e                  _ADC1_SetB_THRESHInterruptHandler
+                  0x0020aa                  _ADC1_B_THRESH_Tasks
+                  0x0020ca                  _ADC1_channel_AN16_CallBack
+                  0x0020d2                  _ADC1_Setchannel_AN16InterruptHandler
+                  0x0020de                  _ADC1_channel_AN17_CallBack
+                  0x0020e6                  _ADC1_Setchannel_AN17InterruptHandler
+                  0x0020f2                  _ADC1_channel_AN18_CallBack
+                  0x0020fa                  _ADC1_Setchannel_AN18InterruptHandler
+                  0x002106                  _ADC1_channel_AN19_CallBack
+                  0x00210e                  _ADC1_Setchannel_AN19InterruptHandler
+                  0x00211a                  _ADC1_channel_AN20_CallBack
+                  0x002122                  _ADC1_Setchannel_AN20InterruptHandler
+ .text            0x00212e        0x12c build/default/production/mcc_generated_files/reset.o
+                  0x00212e                  _RESET_GetCause
+                  0x002136                  _RESET_CauseHandler
+                  0x002252                  _RESET_CauseClearAll
+ .text            0x00225a        0x128 build/default/production/mcc_generated_files/can2.o
+                  0x002268                  _CAN2_Initialize
+                  0x00228a                  _CAN2_OperationModeSet
+                  0x0022f2                  _CAN2_OperationModeGet
+                  0x002300                  _CAN2_IsBusOff
+                  0x002318                  _CAN2_Sleep
+                  0x002328                  _CAN2_DefaultInvalidMessageHandler
+                  0x00232e                  _CAN2_DefaultBusWakeUpActivityHandler
+                  0x002334                  _CAN2_DefaultBusErrorHandler
+                  0x00233a                  _CAN2_DefaultModeChangeHandler
+                  0x002340                  _CAN2_DefaultSystemErrorHandler
+                  0x002346                  _CAN2_Tasks
+ .text            0x002382         0xe2 build/default/production/mcc_generated_files/uart1.o
+                  0x002382                  _UART1_Initialize
+                  0x0023b2                  _UART1_Read
+                  0x0023d0                  _UART1_Write
+                  0x0023e6                  _UART1_IsRxReady
+                  0x0023fa                  _UART1_IsTxReady
+                  0x00241a                  _UART1_IsTxDone
+                  0x002432                  _UART1_StatusGet
+                  0x00244c                  _UART1_Enable
+                  0x002458                  _UART1_Disable
+ .text            0x002464         0xb8 build/default/production/mcc_generated_files/tmr1.o
+                  0x002464                  _TMR1_Initialize
+                  0x002488                  _TMR1_Period16BitSet
+                  0x00249a                  _TMR1_Period16BitGet
+                  0x0024a2                  _TMR1_Counter16BitSet
+                  0x0024b4                  _TMR1_Counter16BitGet
+                  0x0024bc                  _TMR1_CallBack
+                  0x0024c2                  _TMR1_SetInterruptHandler
+                  0x0024d2                  _TMR1_Start
+                  0x0024e2                  _TMR1_Stop
+                  0x0024ec                  _TMR1_GetElapsedThenClear
+                  0x002504                  _TMR1_SoftwareCounterGet
+                  0x002510                  _TMR1_SoftwareCounterClear
+ .text            0x00251c         0x88 build/default/production/mcc_generated_files/pin_manager.o
+                  0x00251c                  _PIN_MANAGER_Initialize
+ .text            0x0025a4         0x6e build/default/production/mcc_generated_files/clock.o
+                  0x0025a4                  _CLOCK_Initialize
+                  0x0025fa                  _CLOCK_AuxPllLockStatusGet
 
-.dinit            0x00261a         0x5e
- .dinit           0x00261a         0x5e data_init
+.dinit            0x002612         0x5e
+ .dinit           0x002612         0x5e data_init
 
-.text             0x002678         0x7c
- .text            0x002678         0x42 build/default/production/mcc_generated_files/interrupt_manager.o
-                  0x002678                  _INTERRUPT_Initialize
- .text            0x0026ba         0x3a build/default/production/mcc_generated_files/system.o
-                  0x0026d8                  _SYSTEM_Initialize
+.text             0x002670         0x7c
+ .text            0x002670         0x42 build/default/production/mcc_generated_files/interrupt_manager.o
+                  0x002670                  _INTERRUPT_Initialize
+ .text            0x0026b2         0x3a build/default/production/mcc_generated_files/system.o
+                  0x0026d0                  _SYSTEM_Initialize
 
-.init.delay32     0x0026f4         0x1c
- .init.delay32    0x0026f4         0x1c /Applications/microchip/xc16/v2.00/bin/bin/../../lib/libc99-pic30-elf.a(delay32ch.Meo)
-                  0x0026f4                  ___delay32
+.init.delay32     0x0026ec         0x1c
+ .init.delay32    0x0026ec         0x1c /Applications/microchip/xc16/v2.00/bin/bin/../../lib/libc99-pic30-elf.a(delay32ch.Meo)
+                  0x0026ec                  ___delay32
 
-.text             0x002710         0x18
- .text            0x002710         0x18 build/default/production/mcc_generated_files/traps.o
-                  0x002710                  _TRAPS_halt_on_error
+.text             0x002708         0x18
+ .text            0x002708         0x18 build/default/production/mcc_generated_files/traps.o
+                  0x002708                  _TRAPS_halt_on_error
 
 data_init_dualch.S.scn1
-                  0x002728          0x2
+                  0x002720          0x2
  data_init_dualch.S.scn1
-                  0x002728          0x2 /Applications/microchip/xc16/v2.00/bin/bin/../../lib/libc99-pic30-elf.a(data_init_dualch.o)
+                  0x002720          0x2 /Applications/microchip/xc16/v2.00/bin/bin/../../lib/libc99-pic30-elf.a(data_init_dualch.o)
