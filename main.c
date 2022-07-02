@@ -137,10 +137,15 @@ uint16_t throttle_range = 0; // set after max and min values are calibrated
 // So give some room for error when driver presses on brake
 #define BRAKE_ERROR_TOLERANCE 50
 
-volatile uint16_t brake = 0;
-uint16_t brake_max = 0;
-uint16_t brake_min = 0x7FFF;
-uint16_t brake_range = 0;
+volatile uint16_t brake1 = 0;
+uint16_t brake1_max = 0;
+uint16_t brake1_min = 0x7FFF;
+uint16_t brake1_range = 0;
+
+volatile uint16_t brake2 = 0;
+uint16_t brake2_max = 0;
+uint16_t brake2_min = 0x7FFF;
+uint16_t brake2_range = 0;
 
 
 // check differential between the throttle sensors
@@ -174,14 +179,14 @@ bool brake_implausible() {
     uint16_t temp_throttle = throttle1 - throttle1_min; 
     
     // subtract dead zone 15%
-    uint16_t temp_brake = brake - ((brake_range)/6);
-    if (temp_brake > brake_max){
-        temp_brake = brake_max;
+    uint16_t temp_brake = brake1 - ((brake1_range)/6);
+    if (temp_brake > brake1_max){
+        temp_brake = brake1_max;
     }
-    if (temp_brake < brake_min){
-        temp_brake = brake_min;
+    if (temp_brake < brake1_min){
+        temp_brake = brake1_min;
     }
-    temp_brake = (uint16_t)((temp_brake-brake_min)*100.0 / brake_range);
+    temp_brake = (uint16_t)((temp_brake-brake1_min)*100.0 / brake1_range);
     
     
     if (error == BRAKE_IMPLAUSIBLE) {
@@ -191,7 +196,8 @@ bool brake_implausible() {
     }
     else {
         // if both brake and throttle applied, brake implausible
-        return (temp_brake > 0 && temp_throttle > throttle_range * 0.25);
+        //return (temp_brake > 0 && temp_throttle > throttle_range * 0.25);
+        return (brake1 >= 500 && temp_throttle > throttle_range * 0.25);
     }
     
 }
@@ -221,8 +227,9 @@ void run_calibration() {
     // APPS2 = pin9 = RA1
     throttle2 = getConversion(APPS2);
     // BSE1 = pin11 = RA3
+    brake1 = getConversion(BSE1);
     // BSE2 = pin12 = RA4
-    brake = getConversion(BSE1);
+    // = getConversion(BSE2);
 
     if (throttle1 > throttle1_max) {
         throttle1_max = throttle1;
@@ -237,14 +244,14 @@ void run_calibration() {
         throttle2_min = throttle2;    
     }
 
-    if (brake > brake_max) {
-        brake_max = brake;
+    if (brake1 > brake1_max) {
+        brake1_max = brake1;
     }
-    if (brake < brake_min) {
-        brake_min = brake;
+    if (brake1 < brake1_min) {
+        brake1_min = brake1;
     }
     throttle_range = throttle1_max - throttle1_min;
-    brake_range = brake_max - brake_min;
+    brake1_range = brake1_max - brake1_min;
 }
 
 // storage variables used to return to previous state when discrepancy is resolved
@@ -257,8 +264,9 @@ void update_sensor_vals() {
     // APPS2 = pin9 = RA1
     throttle2 = getConversion(APPS2);
     // BSE1 = pin11 = RA3
+    brake1 = getConversion(BSE1);
     // BSE2 = pin12 = RA4
-    brake = getConversion(BSE1);
+    //brake2 = getConversion(BSE2);
 
     /* 
      * T.4.2.5 in FSAE 2022 rulebook
@@ -272,7 +280,6 @@ void update_sensor_vals() {
     if (has_discrepancy()) {
         discrepancy_timer_ms += TMR1_PERIOD_MS;
         if (discrepancy_timer_ms > MAX_DISCREPANCY_MS && state == DRIVE) {
-            // ***** UNCOMMENT WHEN PEDALS WORK *****
             temp_state = state;
             temp_error = error;
             report_fault(SENSOR_DISCREPANCY);
@@ -392,12 +399,13 @@ int main(void)
             (uint8_t)(throttle_sent & 0xff), // torque request lower
             (error != ESTOP),
             state_msg_byte,
-            (brake >= ((brake_range)/6))
+            (brake1 >= 400)
         };
 
         msg_TX_torque.field = field_TX_torque; 
         msg_TX_torque.data = data_TX_torque;
         CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_torque);
+        
 //        __delay_ms(50);
 //        
 //        // CAN transmit BSPD flags (DEBUG)
@@ -405,7 +413,7 @@ int main(void)
 //            BSPD_LATCH_GetValue() << 5,
 //            (uint8_t)(throttle1 >> 8), // throttle1 upper
 //            (uint8_t)(throttle2 >> 8), // throttle2 upper
-//            (uint8_t)(brake >> 8), // brake1 upper
+//            (uint8_t)(brake1 >> 8), // brake1 upper
 //            0//(uint8_t)(brake2 >> 8), // brake2 upper
 //        };
 //        data_TX_bspd_flags[0] |= BSPD_TRIPPED_GetValue() << 4;
@@ -472,7 +480,7 @@ int main(void)
                     // Need to press on pedal at the same time to go to drive
                     
                     // ***** UNCOMMENT WHEN PEDALS WORK *****
-                    if (1) {//brake >= PEDAL_MAX - BRAKE_ERROR_TOLERANCE) {
+                    if (brake1 >= 400) {//brake1 >= PEDAL_MAX - BRAKE_ERROR_TOLERANCE) {
                         change_state(DRIVE);                        
                     } else {
                         // Driver didn't press pedal
@@ -497,9 +505,9 @@ int main(void)
                 }
         
                 // ***** UNCOMMENT WHEN PEDALS WORK *****
-//                if (brake_implausible()) {
-//                    report_fault(BRAKE_IMPLAUSIBLE);
-//                }
+                if (brake_implausible()) {
+                    report_fault(BRAKE_IMPLAUSIBLE);
+                }
                 
                 break;
             case FAULT:
