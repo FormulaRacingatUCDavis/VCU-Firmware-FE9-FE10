@@ -37,7 +37,8 @@ typedef enum {
     HV_DISABLED_WHILE_DRIVING,
     SENSOR_DISCREPANCY,
     BRAKE_IMPLAUSIBLE,
-    ESTOP
+    ESTOP,
+    SHUTDOWN_CIRCUIT_OPEN
 } error_t;
 
 // Initial FSM state

@@ -47,18 +47,6 @@
 #include "fsm.h"
 
 
-/************ Timer ************/
-
-// How long to wait for pre-charging to finish before timing out
-#define PRECHARGE_TIMEOUT_MS 5000
-// Keeps track of timer waiting for pre-charging
-unsigned int precharge_timer_ms = 0;
-// Delay between checking pre-charging state
-#define TMR1_PERIOD_MS 20
-// discrepancy timer
-#define MAX_DISCREPANCY_MS 100 
-unsigned int discrepancy_timer_ms = 0;
-
 /************ States ************/
 
 void change_state(const state_t new_state) {
@@ -76,6 +64,36 @@ void report_fault(error_t _error) {
     // Cause of error
     error = _error;
 }
+
+
+/************ Timer ************/
+
+// How long to wait for pre-charging to finish before timing out
+#define PRECHARGE_TIMEOUT_MS 5000
+// Keeps track of timer waiting for pre-charging
+unsigned int precharge_timer_ms = 0;
+// Delay between checking pre-charging state
+#define TMR1_PERIOD_MS 20
+// discrepancy timer
+#define MAX_DISCREPANCY_MS 100 
+unsigned int discrepancy_timer_ms = 0;
+
+
+// runs every 20ms; used for precharge timeout and sensor discrepancy
+void tmr1_ISR() {
+    // CAN receive done here to dodge __delay_ms() latency in main()
+    can_receive();
+    
+    if (state == PRECHARGING) {
+        precharge_timer_ms += TMR1_PERIOD_MS;
+        if (precharge_timer_ms > PRECHARGE_TIMEOUT_MS) {
+            report_fault(CONSERVATIVE_TIMER_MAXED);
+        }
+    } else {
+        precharge_timer_ms = 0;
+    }   
+}
+
 
 /************ Switches ************/
 
@@ -289,10 +307,16 @@ void update_sensor_vals() {
     }
 }
 
+
 /************ Capacitor ************/
 
 volatile uint16_t capacitor_volt = 0;
 #define PRECHARGE_THRESHOLD 4976 // 77V = 90% of nominal accumulator voltage, scaled from range of 0-12800(0V-200V)
+
+
+/************ Shutdown Circuit ************/
+volatile uint8_t shutdown_flags = 0;
+
 
 /************ CAN ************/
 
@@ -314,6 +338,8 @@ void can_receive() {
             case MC_PDO_SEND:
                 capacitor_volt = (msg_RX.data[0] << 8); // upper bits
                 capacitor_volt += msg_RX.data[1]; // lower bits
+            case PEI_CURRENT_SHUTDOWN: 
+                shutdown_flags = msg_RX.data[2];
             default:
                 // no valid input received
                 break;
@@ -321,22 +347,6 @@ void can_receive() {
     } 
 }
 
-/************ Timer ************/
-
-// runs every 20ms; used for precharge timeout and sensor discrepancy
-void tmr1_ISR() {
-    // CAN receive done here to dodge __delay_ms() latency in main()
-    can_receive();
-    
-    if (state == PRECHARGING) {
-        precharge_timer_ms += TMR1_PERIOD_MS;
-        if (precharge_timer_ms > PRECHARGE_TIMEOUT_MS) {
-            report_fault(CONSERVATIVE_TIMER_MAXED);
-        }
-    } else {
-        precharge_timer_ms = 0;
-    }   
-}
 
 /*
             Main application
@@ -427,6 +437,11 @@ int main(void)
 //        CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_bspd_flags);
 //        
 //        __delay_ms(50);
+        
+        // If shutdown circuit opens in any state
+        if (shutdown_flags > 0) {
+            change_state(SHUTDOWN_CIRCUIT_OPEN);
+        }
         
         switch (state) {
             case LV:
@@ -554,10 +569,16 @@ int main(void)
                         if (!drive_switch()) {
                             change_state(HV_ENABLED);
                         }
+                        break;
                     case ESTOP:
                         if (!hv_switch() && !drive_switch()) {
                             change_state(LV);
                         }
+                        break;
+                    case SHUTDOWN_CIRCUIT_OPEN:
+                        if (shutdown_flags == 0) {
+                            change_state(LV);
+                        } 
                 }
                 break;
         }
