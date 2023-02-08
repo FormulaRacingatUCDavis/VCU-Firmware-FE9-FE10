@@ -439,7 +439,7 @@ int main(void)
 //        __delay_ms(50);
         
         // If shutdown circuit opens in any state
-        if (shutdown_flags > 0) {
+        if (shutdown_flags != 255) {
             change_state(SHUTDOWN_CIRCUIT_OPEN);
         }
         
