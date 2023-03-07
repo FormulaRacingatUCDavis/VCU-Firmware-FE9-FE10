@@ -6,18 +6,14 @@
 #ifndef CAN_MANAGER_H
 #define	CAN_MANAGER_H
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+#include "mcc_generated_files/mcc.h"
+#include "mcc_generated_files/system.h"
+#include "stdint.h"
+#include "libpic30.h"
 
+#include "fsm.h"
+#include "sensors.h"
 
-
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif	/* CAN_MANAGER_H */
 
 /********** ENUM OF CAN IDS **********/
 typedef enum {
@@ -37,40 +33,9 @@ typedef enum {
 } CAN_ID;
 
 
-// receive buffer message
-CAN_MSG_OBJ msg_RX;
-
-
-/********** OUTGOING CAN MESSAGES **********/
-
-// torque request command
-//uint8_t data_TX_torque[4];
-CAN_MSG_FIELD field_TX_torque = {
-    .idType = 0,
-    .frameType = 0,
-    .dlc = 6,
-    .formatType = 0,
-    .brs = 0
-};
-CAN_MSG_OBJ msg_TX_torque = {
-    .msgId = TORQUE_REQUEST_COMMAND,
-    .field = {0}, // null
-    .data = 0 // null pointer
-};
-
-// BSPD flags + pedal ADC
-//uint8_t data_TX_bspd_flags[6];
-CAN_MSG_FIELD field_TX_bspd_flags = {
-    .idType = 0,
-    .frameType = 0,
-    .dlc = 6,
-    .formatType = 0,
-    .brs = 0
-};
-CAN_MSG_OBJ msg_TX_bspd_flags = {
-    .msgId = BSPD_FLAGS,
-    .field = {0}, // null
-    .data = 0 // null pointer
-};
-
+void can_init();
 void can_receive();
+void can_tx_torque_request();
+
+
+#endif	/* CAN_MANAGER_H */

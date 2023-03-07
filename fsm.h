@@ -6,18 +6,7 @@
 #ifndef FSM_H
 #define	FSM_H
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-
-
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif	/* FSM_H */
+#include "stdint.h"
 
 /************ States ************/ 
 
@@ -26,7 +15,8 @@ typedef enum {
     PRECHARGING,
     HV_ENABLED,
     DRIVE,
-    FAULT
+    FAULT, 
+    STARTUP
 } state_t;
 
 typedef enum {
@@ -37,15 +27,14 @@ typedef enum {
     HV_DISABLED_WHILE_DRIVING,
     SENSOR_DISCREPANCY,
     BRAKE_IMPLAUSIBLE,
-    ESTOP,
-    SHUTDOWN_CIRCUIT_OPEN
+    SHUTDOWN_CIRCUIT_OPEN,
+    UNCALIBRATED,
+    HARD_BSPD
 } error_t;
 
-// Initial FSM state
-volatile state_t state = LV;
-volatile error_t error = NONE;
-// 8-bit encoding of state to be put on CAN
-volatile uint8_t state_msg_byte = LV;
 
-// true if state/error should be requesting HV
-volatile uint8_t hv_requested = 0;
+void change_state(const state_t new_state);
+void report_fault(error_t _error);
+uint8_t hv_requested();
+
+#endif	/* FSM_H */
