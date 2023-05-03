@@ -3,22 +3,14 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/Users/leoja/Documents/GitHub/VCU-Firmware-FE9/uart.h</file>
-            <file>file:/D:/Users/leoja/Documents/GitHub/VCU-Firmware-FE9/uart.c</file>
-            <file>file:/D:/Users/leoja/Documents/GitHub/VCU-Firmware-FE9/sensors.c</file>
-            <file>file:/D:/Users/leoja/Documents/GitHub/VCU-Firmware-FE9/sensors.h</file>
-            <file>file:/D:/Users/leoja/Documents/GitHub/VCU-Firmware-FE9/mcc_generated_files/mcc.h</file>
-            <file>file:/D:/Users/leoja/Documents/GitHub/VCU-Firmware-FE9/main.h</file>
-            <file>file:/D:/Users/leoja/Documents/GitHub/VCU-Firmware-FE9/mcc_generated_files/system.c</file>
-            <file>file:/D:/Users/leoja/Documents/GitHub/VCU-Firmware-FE9/main.c</file>
             <file>file:/D:/Users/leoja/Documents/GitHub/VCU-Firmware-FE9/fsm.c</file>
-            <file>file:/D:/Users/leoja/Documents/GitHub/VCU-Firmware-FE9/mcc_generated_files/pin_manager.h</file>
-            <file>file:/D:/Users/leoja/Documents/GitHub/VCU-Firmware-FE9/can_manager.h</file>
-            <file>file:/D:/Users/leoja/Documents/GitHub/VCU-Firmware-FE9/mcc_generated_files/tmr1.c</file>
+            <file>file:/D:/Users/leoja/Documents/GitHub/VCU-Firmware-FE9/main.c</file>
+            <file>file:/D:/Users/leoja/Documents/GitHub/VCU-Firmware-FE9/mcc_generated_files/uart1.h</file>
+            <file>file:/D:/Users/leoja/Documents/GitHub/VCU-Firmware-FE9/uart.h</file>
+            <file>file:/D:/Users/leoja/Documents/GitHub/VCU-Firmware-FE9/mcc_generated_files/uart1.c</file>
+            <file>file:/D:/Users/leoja/Documents/GitHub/VCU-Firmware-FE9/uart.c</file>
             <file>file:/D:/Users/leoja/Documents/GitHub/VCU-Firmware-FE9/fsm.h</file>
-            <file>file:/D:/Users/leoja/Documents/GitHub/VCU-Firmware-FE9/can_manager.c</file>
-            <file>file:/D:/Users/leoja/Documents/GitHub/VCU-Firmware-FE9/config.h</file>
-            <file>file:/D:/Users/leoja/Documents/GitHub/VCU-Firmware-FE9/mcc_generated_files/can1.c</file>
+            <file>file:/D:/Users/leoja/Documents/GitHub/VCU-Firmware-FE9/main.h</file>
         </group>
     </open-files>
 </project-private>

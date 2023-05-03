@@ -71,9 +71,10 @@ int main(void)
             report_fault(HARD_BSPD);
         }
         
-        clear_screen();
-        print_state();
-        print_pedal_vals();
+        //clear_screen();
+        //print_state();
+        //print_pedal_vals();
+        gui_dump();
         
         switch (state) {
             case STARTUP: 

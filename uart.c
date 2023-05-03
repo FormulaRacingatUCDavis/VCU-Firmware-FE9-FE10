@@ -12,6 +12,7 @@ extern volatile error_t error;
 extern CALIBRATED_SENSOR_t throttle1;
 extern CALIBRATED_SENSOR_t throttle2;
 extern CALIBRATED_SENSOR_t brake;
+extern volatile uint16_t capacitor_volt;
 
 void print_state(){
     printf("STATE: ");
@@ -81,4 +82,42 @@ void print_pedal_vals(){
 
 void clear_screen(){
     printf("\e[1;1H\e[2J");
+}
+
+void gui_dump(){
+    uart_write(ESCAPE_CHAR);
+    uart_write(FRAME_START);
+    
+    uint16_t bms_volt = 504;
+    
+    send_byte_with_escape(state);
+    send_byte_with_escape(throttle1.percent);
+    send_byte_with_escape(throttle2.percent);
+    send_byte_with_escape(brake.percent);
+    send_byte_with_escape(0xFF&(bms_volt>>8));
+    send_byte_with_escape(0xFF&bms_volt);
+    send_byte_with_escape(0xFF&(capacitor_volt>>8));
+    send_byte_with_escape(0xFF&capacitor_volt);
+    
+    uart_write(ESCAPE_CHAR);
+    uart_write(FRAME_END);
+}
+
+//sends extra escape byte if byte is escape byte
+void send_byte_with_escape(uint8_t byte){
+    if(byte == ESCAPE_CHAR){
+        uart_write(ESCAPE_CHAR);
+    }
+    uart_write(byte);
+}
+
+void uart_write(uint8_t byte){
+    uint8_t counter = 0;
+    
+    while(!UART1_IsTxReady()){
+        counter++;
+        if(counter>255) return;
+    }
+    
+    UART1_Write(byte); 
 }
