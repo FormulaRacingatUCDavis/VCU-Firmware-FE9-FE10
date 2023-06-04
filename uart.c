@@ -90,7 +90,7 @@ void gui_dump(){
     
     uint16_t bms_volt = 504;
     
-    send_byte_with_escape(state);
+    send_byte_with_escape(one_byte_state());
     send_byte_with_escape(throttle1.percent);
     send_byte_with_escape(throttle2.percent);
     send_byte_with_escape(brake.percent);

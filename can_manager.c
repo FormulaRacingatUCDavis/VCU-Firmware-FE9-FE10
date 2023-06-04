@@ -58,10 +58,7 @@ void can_receive() {
 
 //  CAN transmit torque request command
 void can_tx_torque_request(){
-    uint16_t state_msg_byte = state; 
-    if (state == FAULT) { 
-        state_msg_byte = 0b10000000 + error; // greatest bit = 1 if fault 
-    }
+    uint8_t state_msg_byte = one_byte_state(); 
      
     uint16_t throttle_msg_byte = 0;
     if (state == DRIVE) {
