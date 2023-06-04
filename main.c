@@ -60,6 +60,7 @@ int main(void)
         
         update_sensor_vals();
         can_tx_torque_request();
+        can_tx_state();
         
         // If shutdown circuit opens in any state
         if (!shutdown_closed()) {

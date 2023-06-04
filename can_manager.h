@@ -17,10 +17,10 @@
 
 /********** ENUM OF CAN IDS **********/
 typedef enum {
-    VEHICLE_STATE = 0x0c0,
+    VEHICLE_STATE = 0x766,
     BSPD_FLAGS = 0x0c1,
     DRIVER_SWITCHES = 0x0d0,
-    TORQUE_REQUEST_COMMAND = 0x766,
+    TORQUE_REQUEST_COMMAND = 0x0C0,
     BRAKE_COMMAND = 0x767,
     BMS_STATUS_MSG = 0x380,
     PEI_CURRENT_SHUTDOWN = 0x387,
@@ -36,6 +36,7 @@ typedef enum {
 void can_init();
 void can_receive();
 void can_tx_torque_request();
+void can_tx_state();
 
 
 #endif	/* CAN_MANAGER_H */
