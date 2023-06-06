@@ -28,6 +28,7 @@
 
 extern volatile state_t state;
 extern volatile error_t error;
+extern volatile uint8_t mc_lockout;
 extern volatile uint16_t capacitor_volt;
 extern volatile uint8_t shutdown_flags;
 extern volatile uint8_t switches;
@@ -59,7 +60,16 @@ int main(void)
         // Source: https://docs.google.com/document/d/1q0RL4FmDfVuAp6xp9yW7O-vIvnkwoAXWssC3-vBmNGM/edit?usp=sharing
         
         update_sensor_vals();
-        can_tx_torque_request();
+        
+        if (!mc_lockout) {
+            can_tx_torque_request();
+        }
+        
+        
+        // Traction control
+        if (traction_control_enable()) {
+            traction_control_PID();
+        }
         
         // If shutdown circuit opens in any state
         if (!shutdown_closed()) {
@@ -143,6 +153,11 @@ int main(void)
                 
                 break;
             case DRIVE:
+                // CM200 safety feature: starts in lockout mode, disable message must be sent before enable (torque requests)
+                if (mc_lockout) {
+                    can_tx_disable_MC();
+                }
+                
                 if (!drive_switch()) {
                     // Drive switch was flipped off
                     // Revert to HV
@@ -210,7 +225,7 @@ int main(void)
                         if (BSPD_LATCH_GetValue())
                             change_state(LV);
                         
-                    default:  //UNCALIBRATED, DRIVE_REQUEST_FROM_LV, CONSERVATIVE_TIMER_MAXED, HV_DISABLED_WHILE_DRIVING
+                    default:  //UNCALIBRATED, DRIVE_REQUEST_FROM_LV, CONSERVATIVE_TIMER_MAXED, HV_DISABLED_WHILE_DRIVING, MC fault
                         if (!hv_switch() && !drive_switch()) {
                             change_state(LV);
                         }
@@ -244,15 +259,20 @@ void tmr1_ISR() {
 /************ Switches ************/
 
 /*
- * global variable for driver switch status
+ * global variable for driver switch and button status
  * 
- * format: 0000 00[Hv][Dr]
+ * format: 0000 0[TC][Hv][Dr]
  * bit is high if corresponding switch is on, low otherwise
  * 
  * use in conditions:
+ *  - TC = switches & 0b100
  *  - Hv = switches & 0b10
  *  - Dr = switches & 0b1
  */
+
+uint8_t traction_control_enable() {
+    return switches & 0b100;
+}
 
 uint8_t hv_switch() {
     return switches & 0b10;
@@ -262,13 +282,11 @@ uint8_t drive_switch() {
     return switches & 0b1;
 }
 
+
 uint8_t shutdown_closed() {
     if (estop_flags) return 0;
     return (shutdown_flags & 0b00111000) == 0b00111000;
 }
-
-/************ Pedals ************/
-
 
 
 

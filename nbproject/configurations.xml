@@ -32,6 +32,7 @@
       <itemPath>config.h</itemPath>
       <itemPath>sensors.h</itemPath>
       <itemPath>uart.h</itemPath>
+      <itemPath>traction_control.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -69,6 +70,9 @@
       <itemPath>VCU_Firmware_FE9_Remake.mc3</itemPath>
     </logicalFolder>
   </logicalFolder>
+  <sourceRootList>
+    <Elem>.</Elem>
+  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="default" type="2">

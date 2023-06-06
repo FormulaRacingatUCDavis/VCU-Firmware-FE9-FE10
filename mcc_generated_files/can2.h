@@ -194,6 +194,64 @@ CAN_OP_MODES CAN2_OperationModeGet(void);
 
 /**
   @Summary
+    Reads the message object from CAN2 receive FIFO.
+
+  @Description
+    This routine reads a message object from the CAN2 receive FIFO.
+
+  @Preconditions
+    CAN2_Initialize() function should be called before calling this function. 
+    The CAN2_ReceivedMessageCountGet() function should be checked to see if the receiver
+    is not empty before calling this function.
+
+  @Param
+    rxCanMsg    - pointer to the message object
+
+  @Returns
+    true        - Receive successful
+    false       - Receive failure
+
+  @Example
+    <code>
+    int main(void) 
+    {
+        CAN_MSG_OBJ msg;
+     
+        // initialize the device
+        SYSTEM_Initialize();
+        CAN2_OperationModeSet(CAN_CONFIGURATION_MODE);
+        
+        if(CAN_CONFIGURATION_MODE == CAN2_OperationModeGet())
+        {
+            if(CAN_OP_MODE_REQUEST_SUCCESS == CAN2_OperationModeSet(CAN_NORMAL_2_0_MODE))
+            {
+                while(1) 
+                {
+                    if(CAN2_ReceivedMessageCountGet() > 0) 
+                    {
+                        if(true == CAN2_Receive(&msg))
+                        {
+                            break;
+                        }
+                    }
+
+                    CAN2_Tasks();
+                }
+            }
+        }
+
+        while (1)
+        {
+        }
+        
+        return 0;
+    }
+    </code>
+*/
+bool CAN2_Receive(CAN_MSG_OBJ *rxCanMsg);
+
+/**
+  @Summary
     Checks whether the transmitter is in bus off state.
 
   @Description
@@ -256,6 +314,180 @@ bool CAN2_IsBusOff(void);
 
 /**
   @Summary
+    Checks whether the Receiver is in the error passive state.
+
+  @Description
+    This routine checks whether the receive is in the error passive state.
+    If Receiver error counter is above 127, then receiver error passive 
+    state is set.
+
+  @Preconditions
+    CAN2_Initialize function should be called before calling this function.
+
+  @Param
+    None
+
+  @Returns
+    true    - Receiver in Error passive state
+    false   - Receiver not in Error passive state
+
+  @Example
+    <code>
+    int main(void) 
+    {
+        CAN_MSG_OBJ msg;
+     
+        // initialize the device
+        SYSTEM_Initialize();
+        CAN2_OperationModeSet(CAN_CONFIGURATION_MODE);
+        
+        if(CAN_CONFIGURATION_MODE == CAN2_OperationModeGet())
+        {
+            if(CAN_OP_MODE_REQUEST_SUCCESS == CAN2_OperationModeSet(CAN_NORMAL_2_0_MODE))
+            {
+                while(1) 
+                {
+                    if(CAN2_IsRxErrorPassive() == false)
+                    {
+                        if(CAN2_ReceivedMessageCountGet() > 0) 
+                        {
+                            CAN2_Receive(&msg);
+                        }
+                    }
+
+                    CAN2_Tasks();
+                }
+            }
+        }
+        
+        while (1)
+        {
+        }
+        
+        return 0;
+    }
+    </code>
+*/
+bool CAN2_IsRxErrorPassive(void);
+
+/**
+  @Summary
+    Checks whether the Receiver is in the error warning state.
+
+  @Description
+    This routine checks whether the receive is in the error warning state.
+    If Receiver error counter is above 95 to below 128, then receiver error warning 
+    state is set.
+
+  @Preconditions
+    CAN2_Initialize function should be called before calling this function.
+
+  @Param
+    None
+
+  @Returns
+    true    - Receiver in Error warning state
+    false   - Receiver not in Error warning state
+
+  @Example
+    <code>
+    int main(void) 
+    {
+        CAN_MSG_OBJ msg;
+     
+        // initialize the device
+        SYSTEM_Initialize();
+        CAN2_OperationModeSet(CAN_CONFIGURATION_MODE);
+        
+        if(CAN_CONFIGURATION_MODE == CAN2_OperationModeGet())
+        {
+            if(CAN_OP_MODE_REQUEST_SUCCESS == CAN2_OperationModeSet(CAN_NORMAL_2_0_MODE))
+            {
+                while(1) 
+                {
+                    if(CAN2_IsRxErrorWarning() == false)
+                    {
+                        if(CAN2_ReceivedMessageCountGet() > 0) 
+                        {
+                            CAN2_Receive(&msg);
+                        }
+                    }
+
+                    CAN2_Tasks();
+                }
+            }
+        }
+
+        while (1)
+        {
+        }
+        
+        return 0;
+    }
+    </code>
+*/
+bool CAN2_IsRxErrorWarning(void);
+
+/**
+  @Summary
+    Checks whether the Receiver is in the error active state.
+
+  @Description
+    This routine checks whether the receive is in the error active state.
+    If Receiver error counter is above 0 to below 128, then receiver error active 
+    state is set.
+
+  @Preconditions
+    CAN2_Initialize function should be called before calling this function.
+
+  @Param
+    None
+
+  @Returns
+    true    - Receiver in Error active state
+    false   - Receiver not in Error active state
+
+  @Example
+    <code>
+    int main(void) 
+    {
+        CAN_MSG_OBJ msg;
+     
+        // initialize the device
+        SYSTEM_Initialize();
+        CAN2_OperationModeSet(CAN_CONFIGURATION_MODE);
+        
+        if(CAN_CONFIGURATION_MODE == CAN2_OperationModeGet())
+        {
+            if(CAN_OP_MODE_REQUEST_SUCCESS == CAN2_OperationModeSet(CAN_NORMAL_2_0_MODE))
+            {
+                while(1) 
+                {
+                    if(CAN2_IsRxErrorActive() == false)
+                    {
+                        if(CAN2_ReceivedMessageCountGet() > 0) 
+                        {
+                            CAN2_Receive(&msg);
+                        }
+                    }
+
+                    CAN2_Tasks();
+                }
+            }
+        }
+
+        while (1)
+        {
+        }
+        
+        return 0;
+    }
+    </code>
+*/
+bool CAN2_IsRxErrorActive(void);
+
+/**
+  @Summary
     Puts CAN2 module in sleep mode.
 
   @Description
@@ -312,6 +544,58 @@ bool CAN2_IsBusOff(void);
     </code>
 */
 void CAN2_Sleep();
+
+/**
+  @Summary
+    CAN2 RX FIFO number of messages that are received.
+
+  @Description
+    This returns the number of messages that are received.
+
+  @Preconditions
+    CAN2_Initialize function should be called before calling this function.
+
+  @Param
+     None
+
+  @Returns
+    Number of message received.
+
+  @Example
+    <code>
+    int main(void) 
+    {
+        CAN_MSG_OBJ msg;
+     
+        // initialize the device
+        SYSTEM_Initialize();
+        CAN2_OperationModeSet(CAN_CONFIGURATION_MODE);
+
+        if(CAN_CONFIGURATION_MODE == CAN2_OperationModeGet())
+        {
+            if(CAN_OP_MODE_REQUEST_SUCCESS == CAN2_OperationModeSet(CAN_NORMAL_2_0_MODE))
+            {
+                while(1) 
+                {
+                    if(CAN2_ReceivedMessageCountGet() > 0) 
+                    {
+                        CAN2_Receive(&msg);
+                    }
+
+                    CAN2_Tasks();
+                }
+            }
+        }
+
+        while (1)
+        {
+        }
+        
+        return 0;
+    }
+    </code>
+*/
+uint8_t CAN2_ReceivedMessageCountGet(void);
 
 /**
   @Summary
@@ -655,6 +939,64 @@ void CAN2_DefaultModeChangeHandler(void);
     </code>
 */
 void CAN2_DefaultSystemErrorHandler(void);
+
+/**
+  @Summary
+    Callback for CAN2 Receive Buffer OverFlow .
+
+  @Description
+    This routine is callback for CAN2 receive buffer overFlow  
+
+  @Param
+    None.
+
+  @Returns
+    None
+ 
+  @Example 
+    <code>
+    bool gRxOverFlowOccurred = false;
+    
+    void CAN2_DefaultRxBufferOverFlowHandler(void)
+    {
+        gRxOverFlowOccurred = true;
+        //CAN Receive Buffer OverFlow application code
+    }
+ 
+    int main(void) 
+    {    
+        // initialize the device
+        SYSTEM_Initialize();
+        CAN2_OperationModeSet(CAN_CONFIGURATION_MODE);
+
+        if(CAN_CONFIGURATION_MODE == CAN2_OperationModeGet())
+        {    
+            if(CAN_OP_MODE_REQUEST_SUCCESS == CAN2_OperationModeSet(CAN_NORMAL_2_0_MODE))
+            {
+                while(1) 
+                {
+                    if(gRxOverFlowOccurred == true)
+                    {
+                        gRxOverFlowOccurred = false;
+                        // User Application code
+                        break;
+                        
+                    }
+                }
+
+                CAN2_Tasks();
+            }
+        }
+        
+        while (1)
+        {
+        }
+        
+        return 0;
+    }
+    </code>
+*/
+void CAN2_DefaultRxBufferOverFlowHandler(void);
 
 /**
   @Summary		
