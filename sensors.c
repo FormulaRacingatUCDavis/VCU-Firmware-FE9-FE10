@@ -81,7 +81,7 @@ void update_sensor_vals() {
 uint16_t requested_throttle(){
     temp_attenuate();
     
-    uint32_t throttle = (uint32_t)(throttle1.percent * (0x7fff / 100));  //upscale for MC code
+    uint32_t throttle = ((uint32_t)throttle1.percent * MAX_TORQUE) / 100;  //upscale for MC code
     throttle = (throttle * THROTTLE_MULTIPLIER) / 100;       //attenuate for temperature
     return (uint16_t)throttle;
 }
@@ -98,7 +98,7 @@ void temp_attenuate() {
 }
 
 bool sensors_calibrated(){
-    if(throttle1.range < APPS1_MIN_RANGE) return 0;
+    if(throttle2.range < APPS1_MIN_RANGE) return 0;
     if(brake.range < BRAKE_MIN_RANGE) return 0;
     
     return 1;

@@ -47,8 +47,10 @@
 // On the breadboard, the range of values for the potentiometer is 0 to 4095
 #define PEDAL_MAX 4095
 
-#define APPS1_MIN_RANGE 0xD00   //will not enter HV until pedal is calibrated
-#define BRAKE_MIN_RANGE 0x300
+//minimum calibration ranges
+#define APPS1_MIN_RANGE 3200   //will not enter HV until pedal is calibrated
+#define APPS2_MIN_RNAGE 800
+#define BRAKE_MIN_RANGE 800
 
 //in percent:
 #define APPS1_BSPD_THRESHOLD 25  
@@ -61,6 +63,8 @@
 #define BRAKE_LIGHT_THRESHOLD 400     
 #define RTD_BRAKE_THRESHOLD 500  //brake threshold to enter drive mode
 #define BRAKE_BSPD_THRESHOLD 500
+
+#define MAX_TORQUE 2300  //230 Nm
 
 #endif	/* XC_HEADER_TEMPLATE_H */
 

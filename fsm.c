@@ -30,3 +30,12 @@ uint8_t hv_requested(){
         || (error == SENSOR_DISCREPANCY)
         || (error == BRAKE_IMPLAUSIBLE);
 }
+
+uint8_t one_byte_state(){
+    uint8_t state_byte = state;
+    if (state == FAULT) { 
+        state_byte = 0b10000000 + error; // greatest bit = 1 if fault 
+    }
+    
+    return state_byte;
+}

@@ -41,7 +41,7 @@ CAN_MSG_OBJ msg_TX_mc_command = {
 CAN_MSG_FIELD field_TX_vcu_state = {
     .idType = 0,
     .frameType = 0,
-    .dlc = 6,
+    .dlc = 8,
     .formatType = 0,
     .brs = 0
 };
@@ -105,30 +105,20 @@ void can_receive() {
     } 
 }
 
-// CAN transmit VCU state and HV request 
+//  CAN transmit torque request command
 void can_tx_vcu_state(){
-    uint16_t state_msg_byte = state; 
-    if (state == FAULT) { 
-        state_msg_byte = 0b10000000 + error; // greatest bit = 1 if fault 
-    }
-     
-    uint16_t throttle_msg_byte = 0;
-    if (state == DRIVE) {
-        throttle_msg_byte = requested_throttle();
-    }
-    
-    uint8_t data_TX_torque[6] = {
-        hv_requested(),
-        (uint8_t)(throttle_msg_byte >> 8), // torque request upper
-        (uint8_t)(throttle_msg_byte & 0xff), // torque request lower
-        (error != SHUTDOWN_CIRCUIT_OPEN),
-        state_msg_byte,
+    uint8_t data_TX_state[6] = {
+        0,
+        0,
+        0,
+        0,
+        one_byte_state(),
         braking()
     };
 
-    msg_TX_mc_command.field = field_TX_vcu_state; 
-    msg_TX_mc_command.data = data_TX_torque;
-    CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_mc_command);
+    msg_TX_vcu_state.field = field_TX_vcu_state; 
+    msg_TX_vcu_state.data = data_TX_state;
+    CAN1_Transmit(CAN1_TX_TXQ, &msg_TX_vcu_state);
 }
 
 void can_tx_torque_request(){
@@ -138,13 +128,16 @@ void can_tx_torque_request(){
         throttle_msg_byte = requested_throttle() + TC_torque_adjustment;
     }
     
+    uint8_t byte5 = 0b010;   //speed mode | discharge_enable | inverter enable
+    byte5 |= (hv_requested() & 0x01);  //set inverter enable bit
+    
     uint8_t data_TX_torque[8] = {
         (uint8_t)(throttle_msg_byte & 0xff), // 0 - torque command lower (Nm*10)
-        (uint8_t)(throttle_msg_byte >> 8), // 1 - torque command upper (Nm*10)
+        (uint8_t)(throttle_msg_byte >> 8) & 0xFF, // 1 - torque command upper (Nm*10)
         0, // 2 - speed command lower (not applicable)
         0, // 3 - speed command upper (not applicable)
         1, // 4 - direction (1 = forward, 0 = backward)
-        0, // 5 - mode (0 = torque mode, 1 = speed mode)
+        byte5, // 5 - mode (0 = torque mode, 1 = speed mode)
         0, // 6 - torque limit lower (if 0, default EEPROM value used)
         0 // 7 - torque limit upper (if 0, default EEPROM value used)
     };

@@ -61,10 +61,11 @@ int main(void)
         
         update_sensor_vals();
         
+        can_tx_vcu_state();
+
         if (!mc_lockout) {
             can_tx_torque_request();
         }
-        
         
         // Traction control
         if (traction_control_enable()) {
