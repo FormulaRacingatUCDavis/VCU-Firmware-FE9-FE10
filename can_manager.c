@@ -46,7 +46,7 @@ CAN_MSG_FIELD field_TX_vcu_state = {
     .brs = 0
 };
 CAN_MSG_OBJ msg_TX_vcu_state = {
-    .msgId = VCU_STATE,
+    .msgId = VEHICLE_STATE,
     .field = {0}, // null
     .data = 0 // null pointer
 };
@@ -107,12 +107,20 @@ void can_receive() {
 
 //  CAN transmit torque request command
 void can_tx_vcu_state(){
-    uint8_t data_TX_state[6] = {
+//    uint8_t data_TX_state[6] = {
+//        0,
+//        0,
+//        0,
+//        0,
+//        one_byte_state(),
+//        braking()
+//    };
+        uint8_t data_TX_state[6] = {
         0,
         0,
         0,
         0,
-        one_byte_state(),
+        2, 
         braking()
     };
 

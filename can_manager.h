@@ -20,7 +20,7 @@ typedef enum {
     // PCAN
     BSPD_FLAGS = 0x0c1,
     DRIVER_SWITCHES = 0x0d0,
-    VCU_STATE = 0x766,
+    VEHICLE_STATE = 0x766,
     MC_COMMAND = 0x0C0, 
     BRAKE_COMMAND = 0x767,
     BMS_STATUS_MSG = 0x380,
