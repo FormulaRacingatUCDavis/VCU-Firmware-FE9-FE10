@@ -66,14 +66,18 @@ void can_receive() {
                 break;
             case PEI_ESTOP:
                 estop_flags = msg_RX.data[0];
+                break;
             case MC_VOLTAGE_INFO: 
                 capacitor_volt = (msg_RX.data[0] << 8); // upper bits
                 capacitor_volt += msg_RX.data[1]; // lower bits
+                break;
             case MC_INTERNAL_STATES:
                 mc_lockout = msg_RX.data[6] & 0b1000000;
                 mc_enabled = msg_RX.data[6] & 0b1;
+                break;
             case PEI_CURRENT_SHUTDOWN: 
                 shutdown_flags = msg_RX.data[2];
+                break;
             default:
                 // no valid input received
                 break;
