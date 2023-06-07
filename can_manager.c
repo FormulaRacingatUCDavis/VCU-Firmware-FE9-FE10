@@ -64,9 +64,6 @@ void can_receive() {
                 PACK_TEMP = msg_RX.data[0];
                 temp_attenuate();
                 break;
-            case PEI_ESTOP:
-                estop_flags = msg_RX.data[0];
-                break;
             case MC_VOLTAGE_INFO: 
                 capacitor_volt = (msg_RX.data[0] << 8); // upper bits
                 capacitor_volt += msg_RX.data[1]; // lower bits
@@ -124,7 +121,7 @@ void can_tx_vcu_state(){
         0,
         0,
         0,
-        2, 
+        one_byte_state(), 
         braking()
     };
 

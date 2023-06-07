@@ -49,7 +49,7 @@
 #include <string.h>    
 #include "can1.h"
 
-#define CAN1_FIFO_ALLOCATE_RAM_SIZE    32U //CAN FIFO allocated ram size based on (number of FIFO x FIFO message Payload size x Message object DLC size)
+#define CAN1_FIFO_ALLOCATE_RAM_SIZE    144U //CAN FIFO allocated ram size based on (number of FIFO x FIFO message Payload size x Message object DLC size)
 #define CAN1_NUM_OF_RX_FIFO            1U    // No of RX FIFO's configured
 #define CAN1_RX_FIFO_MSG_DATA          8U   // CAN RX FIFO Message object data field size
 
@@ -205,7 +205,7 @@ static void CAN1_FIFO_InfoGet(const uint8_t fifoNum, CAN1_FIFO_INFO *fifoInfo)
         case CAN1_FIFO_1:
             fifoInfo->address = (uint16_t *) &C1FIFOUA1L;
             fifoInfo->payloadSize = 8U;
-            fifoInfo->msgDeepSize = 1U;
+            fifoInfo->msgDeepSize = 8U;
             break;
      
         default:
@@ -599,8 +599,8 @@ static void CAN1_RX_FIFO_Configuration(void)
 {          
     // TFHRFHIE disabled; TFERFFIE disabled; RXTSEN disabled; TXREQ disabled; RXOVIE disabled; RTREN disabled; TXEN disabled; TXATIE disabled; UINC disabled; FRESET enabled; TFNRFNIE disabled; 
     C1FIFOCON1L = 0x400;
-    // TXAT Disabled; PLSIZE 8; FSIZE 1; TXPRI 0; 
-    C1FIFOCON1H = 0x00;
+    // TXAT Disabled; PLSIZE 8; FSIZE 8; TXPRI 0; 
+    C1FIFOCON1H = 0x700;
 }
 
 /**
@@ -628,12 +628,12 @@ static void CAN1_RX_FIFO_FilterMaskConfiguration(void)
     
     // message stored in FIFO1
     C1FLTCON0Lbits.F0BP = 0x01;
-    // EID 0; SID 208; 
-    C1FLTOBJ0L = 0xD0;
+    // EID 0; SID 80; 
+    C1FLTOBJ0L = 0x50;
     // EID 0; EXIDE disabled; SID11 disabled; 
     C1FLTOBJ0H = 0x00;
-    // MSID 0; MEID 0; 
-    C1MASK0L = 0x00;
+    // MSID 1024; MEID 0; 
+    C1MASK0L = 0x400;
     // MEID 0; MSID11 disabled; MIDE enabled; 
     C1MASK0H = 0x4000;
     // Enable the filter 0

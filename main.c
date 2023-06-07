@@ -61,6 +61,10 @@ int main(void)
         
         update_sensor_vals();
         
+        for(uint8_t i = 0; i < 8; i++){
+            can_receive();
+        }
+        
         can_tx_vcu_state();
 
         if (!mc_lockout) {
@@ -85,7 +89,8 @@ int main(void)
         //clear_screen();
         //print_state();
         //print_pedal_vals();
-        gui_dump();
+        //gui_dump();
+        printf("%u\r\n", switches);
         
         switch (state) {
             case STARTUP: 
@@ -244,7 +249,7 @@ int main(void)
 // runs every 20ms; used for precharge timeout and sensor discrepancy
 void tmr1_ISR() {
     // CAN receive done here to dodge __delay_ms() latency in main()
-    can_receive();
+    
     
     if (state == PRECHARGING) {
         precharge_timer_ms += TMR1_PERIOD_MS;
