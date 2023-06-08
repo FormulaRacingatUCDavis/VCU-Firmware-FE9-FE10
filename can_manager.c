@@ -12,6 +12,7 @@ volatile uint8_t shutdown_flags = 0b00111000;  //start with shutdown flags OK
 volatile uint8_t estop_flags = 0;
 volatile uint8_t switches = 0xC0;   //start with switches on to stay in startup state
 volatile uint8_t PACK_TEMP;
+volatile uint8_t mc_fault;
 
 // From TCAN
 volatile uint16_t front_right_wheel_speed = 0;
@@ -75,11 +76,29 @@ void can_receive() {
             case PEI_CURRENT_SHUTDOWN: 
                 shutdown_flags = msg_RX.data[2];
                 break;
+            case MC_FAULT_CODES:
+                for (uint8_t i = 0; i < 8; i++) {
+                    if (msg_RX.data[i] > 0) {
+                        mc_fault = 1;
+                        break;
+                    }
+                    else {
+                        mc_fault = 0;
+                    }
+                }
             default:
                 // no valid input received
                 break;
         }
+        printf("ID: %d \n\r", msg_RX.msgId);
+        for (uint8_t i = 1; i < msg_RX.field.dlc; i++) {
+            printf("byte %d: %d\n\r", i, msg_RX.data[i]);
+        }
+        printf("\n\r");
     } 
+    else {
+        printf("No message received.\n\r");
+    }
     
     if (CAN2_Receive(&msg_RX)) {
         switch (msg_RX.msgId) {
@@ -108,14 +127,6 @@ void can_receive() {
 
 //  CAN transmit torque request command
 void can_tx_vcu_state(){
-//    uint8_t data_TX_state[6] = {
-//        0,
-//        0,
-//        0,
-//        0,
-//        one_byte_state(),
-//        braking()
-//    };
         uint8_t data_TX_state[6] = {
         0,
         0,

@@ -34,6 +34,7 @@ extern volatile uint8_t shutdown_flags;
 extern volatile uint8_t switches;
 extern volatile uint8_t estop_flags;
 extern unsigned int discrepancy_timer_ms;
+extern volatile uint8_t mc_fault;
 
 
 // Keeps track of timer waiting for pre-charging
@@ -86,11 +87,15 @@ int main(void)
             report_fault(HARD_BSPD);
         }
         
+        if (mc_fault) {
+            report_fault(MC_FAULT);
+        }
+        
         //clear_screen();
         //print_state();
         //print_pedal_vals();
         //gui_dump();
-        printf("%u\r\n", switches);
+        //printf("%u\r\n", switches);
         
         switch (state) {
             case STARTUP: 
@@ -231,7 +236,7 @@ int main(void)
                         if (BSPD_LATCH_GetValue())
                             change_state(LV);
                         
-                    default:  //UNCALIBRATED, DRIVE_REQUEST_FROM_LV, CONSERVATIVE_TIMER_MAXED, HV_DISABLED_WHILE_DRIVING, MC fault
+                    default:  //UNCALIBRATED, DRIVE_REQUEST_FROM_LV, CONSERVATIVE_TIMER_MAXED, HV_DISABLED_WHILE_DRIVING, MC FAULT
                         if (!hv_switch() && !drive_switch()) {
                             change_state(LV);
                         }
