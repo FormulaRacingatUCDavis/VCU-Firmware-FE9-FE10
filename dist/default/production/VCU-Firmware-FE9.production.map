@@ -221,11 +221,11 @@ section                    address      alignment gaps    total length  (dec)
 .ndata                      0x1064                   0             0x2  (2)
 .nbss                       0x1066                   0             0x4  (4)
 .bss                        0x106a                   0             0x2  (2)
-_0000000008703D2064813bae    0x106c                   0            0x90  (144)
+_0000000008705D20648274ce    0x106c                   0            0x90  (144)
 .data                       0x10fc                   0            0x42  (66)
 .bss                        0x113e                   0            0x3e  (62)
 .data                       0x117c                   0            0x1c  (28)
-_0000000008712D2064813bae    0x1198                   0            0x10  (16)
+_00000000087A3D20648274ce    0x1198                   0            0x10  (16)
 .bss                        0x11a8                   0            0x10  (16)
 .bss                        0x11b8                   0             0x2  (2)
 
@@ -1211,41 +1211,41 @@ __FBTSEQ
 .comment
  *(.comment)
 
-.debug_info       0x000000      0x12436
+.debug_info       0x000000      0x12336
  *(.debug_info)
- .debug_info      0x000000        0x638 build/default/production/mcc_generated_files/traps.o
- .debug_info      0x000638       0x159b build/default/production/mcc_generated_files/system.o
- .debug_info      0x001bd3        0x550 build/default/production/mcc_generated_files/clock.o
- .debug_info      0x002123        0x6ce build/default/production/mcc_generated_files/pin_manager.o
- .debug_info      0x0027f1        0x49e build/default/production/mcc_generated_files/reset.o
- .debug_info      0x002c8f        0xa5a build/default/production/mcc_generated_files/uart1.o
- .debug_info      0x0036e9        0x366 build/default/production/mcc_generated_files/interrupt_manager.o
- .debug_info      0x003a4f       0x1e9a build/default/production/mcc_generated_files/can2.o
- .debug_info      0x0058e9       0x2306 build/default/production/mcc_generated_files/can1.o
- .debug_info      0x007bef        0x8a6 build/default/production/mcc_generated_files/tmr1.o
- .debug_info      0x008495       0x25ad build/default/production/mcc_generated_files/adc1.o
- .debug_info      0x00aa42       0x1c02 build/default/production/main.o
- .debug_info      0x00c644       0x1c72 build/default/production/can_manager.o
- .debug_info      0x00e2b6        0x384 build/default/production/fsm.o
- .debug_info      0x00e63a       0x1c09 build/default/production/sensors.o
- .debug_info      0x010243       0x17f1 build/default/production/uart.o
- .debug_info      0x011a34         0x90 c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(fixunssfsi.CH_o)
- .debug_info      0x011ac4         0x91 c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(floatunsisf.CH_o)
- .debug_info      0x011b55         0x8d c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(funpack.CH_o)
- .debug_info      0x011be2         0x8d c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.CH_o)
- .debug_info      0x011c6f         0x9d c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(addsf3x.CH_o)
- .debug_info      0x011d0c         0x9d c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(divsf3x.CH_o)
- .debug_info      0x011da9         0x9d c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(mulsf3x.CH_o)
- .debug_info      0x011e46         0xa0 c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(dnrmpackfx.CH_o)
- .debug_info      0x011ee6         0xa2 c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(unpackdnrmfx.CH_o)
- .debug_info      0x011f88         0x9c c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(typefx.CH_o)
- .debug_info      0x012024         0x9f c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(propnanfx.CH_o)
- .debug_info      0x0120c3         0x9d c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(spackfx.CH_o)
- .debug_info      0x012160         0x9e c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(unpackfx.CH_o)
- .debug_info      0x0121fe         0x91 c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(floatundisf.CH_o)
- .debug_info      0x01228f         0x8b c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(fpack.CH_o)
- .debug_info      0x01231a         0x90 c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(extendsfdf.CH_o)
- .debug_info      0x0123aa         0x8c c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(mulsi3.CH_o)
+ .debug_info      0x000000        0x628 build/default/production/mcc_generated_files/traps.o
+ .debug_info      0x000628       0x158b build/default/production/mcc_generated_files/system.o
+ .debug_info      0x001bb3        0x540 build/default/production/mcc_generated_files/clock.o
+ .debug_info      0x0020f3        0x6be build/default/production/mcc_generated_files/pin_manager.o
+ .debug_info      0x0027b1        0x48e build/default/production/mcc_generated_files/reset.o
+ .debug_info      0x002c3f        0xa4a build/default/production/mcc_generated_files/uart1.o
+ .debug_info      0x003689        0x356 build/default/production/mcc_generated_files/interrupt_manager.o
+ .debug_info      0x0039df       0x1e8a build/default/production/mcc_generated_files/can2.o
+ .debug_info      0x005869       0x22f6 build/default/production/mcc_generated_files/can1.o
+ .debug_info      0x007b5f        0x896 build/default/production/mcc_generated_files/tmr1.o
+ .debug_info      0x0083f5       0x259d build/default/production/mcc_generated_files/adc1.o
+ .debug_info      0x00a992       0x1bf2 build/default/production/main.o
+ .debug_info      0x00c584       0x1c62 build/default/production/can_manager.o
+ .debug_info      0x00e1e6        0x374 build/default/production/fsm.o
+ .debug_info      0x00e55a       0x1bf9 build/default/production/sensors.o
+ .debug_info      0x010153       0x17e1 build/default/production/uart.o
+ .debug_info      0x011934         0x90 c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(fixunssfsi.CH_o)
+ .debug_info      0x0119c4         0x91 c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(floatunsisf.CH_o)
+ .debug_info      0x011a55         0x8d c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(funpack.CH_o)
+ .debug_info      0x011ae2         0x8d c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(udivsi3.CH_o)
+ .debug_info      0x011b6f         0x9d c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(addsf3x.CH_o)
+ .debug_info      0x011c0c         0x9d c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(divsf3x.CH_o)
+ .debug_info      0x011ca9         0x9d c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(mulsf3x.CH_o)
+ .debug_info      0x011d46         0xa0 c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(dnrmpackfx.CH_o)
+ .debug_info      0x011de6         0xa2 c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(unpackdnrmfx.CH_o)
+ .debug_info      0x011e88         0x9c c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(typefx.CH_o)
+ .debug_info      0x011f24         0x9f c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(propnanfx.CH_o)
+ .debug_info      0x011fc3         0x9d c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(spackfx.CH_o)
+ .debug_info      0x012060         0x9e c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(unpackfx.CH_o)
+ .debug_info      0x0120fe         0x91 c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(floatundisf.CH_o)
+ .debug_info      0x01218f         0x8b c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(fpack.CH_o)
+ .debug_info      0x01221a         0x90 c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(extendsfdf.CH_o)
+ .debug_info      0x0122aa         0x8c c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(mulsi3.CH_o)
  *(.gnu.linkonce.wi.*)
 
 .debug_abbrev     0x000000       0x1755
@@ -5098,9 +5098,9 @@ __xc_reference_data
  .nbss              0x1068          0x2 c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(errno.CH_o)
                     0x1068                  _errno
 
-_0000000008703D2064813bae
+_0000000008705D20648274ce
                     0x106c         0x90
- _0000000008703D2064813bae
+ _0000000008705D20648274ce
                     0x106c         0x90 build/default/production/mcc_generated_files/can1.o
 
 .data               0x10fc         0x42
@@ -5118,9 +5118,9 @@ _0000000008703D2064813bae
 .data               0x117c         0x1c
  .data              0x117c         0x1c c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-elf.a(__printf_core.CH_o)
 
-_0000000008712D2064813bae
+_00000000087A3D20648274ce
                     0x1198         0x10
- _0000000008712D2064813bae
+ _00000000087A3D20648274ce
                     0x1198         0x10 build/default/production/mcc_generated_files/can2.o
 
 .bss                0x11a8         0x10

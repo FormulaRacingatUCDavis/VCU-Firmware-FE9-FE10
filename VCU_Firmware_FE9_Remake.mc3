@@ -8276,7 +8276,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="CAN FD1" name="Filter0 Invalid Message ID"/>
-         <value></value>
+         <value/>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="CAN FD1" name="Filter0 Mask EID "/>
@@ -8300,15 +8300,15 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="CAN FD1" name="Nominal BRP"/>
-         <value>20</value>
+         <value>1</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="CAN FD1" name="Nominal Bit Rate"/>
-         <value>125Kbps</value>
+         <value>500Kbps</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="CAN FD1" name="Nominal SJW"/>
-         <value>2 TQ</value>
+         <value>10 TQ</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="CAN FD1" name="Nominal Sample Point"/>
@@ -8316,15 +8316,15 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="CAN FD1" name="Nominal Time Quanta"/>
-         <value>8</value>
+         <value>40</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="CAN FD1" name="Nominal Time Segment1"/>
-         <value>5 TQ</value>
+         <value>29 TQ</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="CAN FD1" name="Nominal Time Segment2"/>
-         <value>2 TQ</value>
+         <value>10 TQ</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="CAN FD1" name="Requested Clock Available"/>
@@ -17644,11 +17644,11 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.RegisterKey" moduleName="CAN FD1 MODULE" registerAlias="CNBTCFGH"/>
-         <value>4868</value>
+         <value>28</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.RegisterKey" moduleName="CAN FD1 MODULE" registerAlias="CNBTCFGL"/>
-         <value>257</value>
+         <value>2313</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.RegisterKey" moduleName="CAN FD1 MODULE" registerAlias="CRXIFH"/>
@@ -20492,19 +20492,19 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.SettingKey" moduleName="CAN FD1 MODULE" registerAlias="CNBTCFGH" settingAlias="BRP"/>
-         <value>19</value>
+         <value>0</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.SettingKey" moduleName="CAN FD1 MODULE" registerAlias="CNBTCFGH" settingAlias="TSEG1"/>
-         <value>4</value>
+         <value>28</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.SettingKey" moduleName="CAN FD1 MODULE" registerAlias="CNBTCFGL" settingAlias="SJW"/>
-         <value>1</value>
+         <value>9</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.SettingKey" moduleName="CAN FD1 MODULE" registerAlias="CNBTCFGL" settingAlias="TSEG2"/>
-         <value>1</value>
+         <value>9</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.SettingKey" moduleName="CAN FD1 MODULE" registerAlias="CRXIFH" settingAlias="RFIF16"/>
@@ -21912,7 +21912,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="CAN FD2" name="Filter0 Invalid Message ID"/>
-         <value></value>
+         <value/>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="CAN FD2" name="Filter0 Mask EID "/>
@@ -49122,7 +49122,7 @@
       </entry>
       <entry>
          <file>mcc_generated_files\system.c</file>
-         <hash>077cd258571abb9cf83941e9fdc80a6b9d17c54f968efea1f673dd7c321a2980</hash>
+         <hash>ff5ac132927c89579f357ae96d665709daa44f12421a65a8ea402e1d16769f54</hash>
       </entry>
       <entry>
          <file>mcc_generated_files\clock.h</file>
@@ -49138,23 +49138,23 @@
       </entry>
       <entry>
          <file>mcc_generated_files\mcc.h</file>
-         <hash>cbe442ca52766097a9fe65f210d2c392c3cb55ae919e0cdd4431738d5e96e467</hash>
-      </entry>
-      <entry>
-         <file>mcc_generated_files\uart1.h</file>
-         <hash>a82cbe81b2c3e3f4ca1a06d62bc57d8b50424becdb2fc49024203e688edb2bfd</hash>
+         <hash>92220401b9aa94445006cfdb88f8f633afb8fa8c549d76c0901c4f978241bfd9</hash>
       </entry>
       <entry>
          <file>mcc_generated_files\reset.c</file>
          <hash>1e8e3f9e541e32695d9350039ccec3e2af9334cb6fca3d713458f6e5ef797dd6</hash>
       </entry>
       <entry>
-         <file>mcc_generated_files\uart1.c</file>
-         <hash>bf77aa7abe13b3cbfb1f677d183bfa1e0a8249df1b3c076bd2c68322a268d066</hash>
+         <file>mcc_generated_files\uart1.h</file>
+         <hash>a82cbe81b2c3e3f4ca1a06d62bc57d8b50424becdb2fc49024203e688edb2bfd</hash>
       </entry>
       <entry>
          <file>mcc_generated_files\tmr1.h</file>
          <hash>8db036e16952e6fbf2ca47e896a1cb3ceaf4c3198c203ab7f2352587b9c2bd83</hash>
+      </entry>
+      <entry>
+         <file>mcc_generated_files\uart1.c</file>
+         <hash>bf77aa7abe13b3cbfb1f677d183bfa1e0a8249df1b3c076bd2c68322a268d066</hash>
       </entry>
       <entry>
          <file>mcc_generated_files\clock.c</file>
@@ -49182,7 +49182,7 @@
       </entry>
       <entry>
          <file>mcc_generated_files\pin_manager.c</file>
-         <hash>348552fbc0f29ad1bde1de6dbdfaaf901474b1e821f224e7f6bc5b3e5a72d2cc</hash>
+         <hash>407827dcc23582f27c46d36c020477575deeac443fd27c6161e95ec11febb127</hash>
       </entry>
       <entry>
          <file>mcc_generated_files\can2.c</file>
@@ -49190,7 +49190,7 @@
       </entry>
       <entry>
          <file>mcc_generated_files\can1.c</file>
-         <hash>d76b0294f8d4a2fca6279a2f6a901128eb8c8c05c5a65d360134a2962df87163</hash>
+         <hash>9d65c516c3ed96a18a1f447f9975bc3836e95e1e2b314efb2307e555bb8971bc</hash>
       </entry>
       <entry>
          <file>mcc_generated_files\traps.c</file>
