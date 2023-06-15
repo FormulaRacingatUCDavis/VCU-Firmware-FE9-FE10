@@ -145,7 +145,7 @@ void can_tx_torque_request(){
     
     uint16_t throttle_msg_byte = 0;
     if (state == DRIVE) {
-        throttle_msg_byte = requested_throttle() + TC_torque_adjustment;
+        throttle_msg_byte = requested_throttle() - TC_torque_adjustment;
     }
     
     uint8_t byte5 = 0b010;   //speed mode | discharge_enable | inverter enable
@@ -157,7 +157,7 @@ void can_tx_torque_request(){
         0, // 2 - speed command lower (not applicable)
         0, // 3 - speed command upper (not applicable)
         1, // 4 - direction (1 = forward, 0 = backward)
-        byte5, // 5 - mode (0 = torque mode, 1 = speed mode)
+        byte5, // 5 - speed mode | discharge_enable | inverter enable
         0, // 6 - torque limit lower (if 0, default EEPROM value used)
         0 // 7 - torque limit upper (if 0, default EEPROM value used)
     };
