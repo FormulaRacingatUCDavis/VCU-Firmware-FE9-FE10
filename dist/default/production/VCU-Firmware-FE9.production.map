@@ -197,14 +197,14 @@ section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
 .text                        0x200              0x1aea          0x285f  (10335)
 .const                      0x1cea               0x190           0x258  (600)
-.text                       0x1e7a              0x1f6e          0x2f25  (12069)
-.dinit                      0x3de8                0xea           0x15f  (351)
-.text                       0x3ed2               0x384           0x546  (1350)
-.init.delay32               0x4256                0x1c            0x2a  (42)
-.text                       0x4272                0x18            0x24  (36)
-data_init_dualch.S.scn1     0x428a                 0x2             0x3  (3)
+.text                       0x1e7a              0x1f62          0x2f13  (12051)
+.dinit                      0x3ddc                0xea           0x15f  (351)
+.text                       0x3ec6               0x384           0x546  (1350)
+.init.delay32               0x424a                0x1c            0x2a  (42)
+.text                       0x4266                0x18            0x24  (36)
+data_init_dualch.S.scn1     0x427e                 0x2             0x3  (3)
 
-                 Total "program" memory used (bytes):         0x60d2  (24786) 9%
+                 Total "program" memory used (bytes):         0x60c0  (24768) 9%
 
 
 "data" Memory  [Origin = 0x1000, Length = 0x8000]
@@ -455,87 +455,87 @@ External Symbols in Program Memory (by address):
                   0x0031ae                  _clamp
                   0x0031e0                  _init_sensors
                   0x00320a                  _traction_control_PID
-                  0x0032f0                  _main
-                  0x0034d4                  _tmr1_ISR
-                  0x0034f6                  _traction_control_enable
-                  0x003500                  _hv_switch
-                  0x00350a                  _drive_switch
-                  0x003514                  _shutdown_closed
-                  0x00353a                  _can_receive
-                  0x00375e                  _can_tx_vcu_state
-                  0x0037a4                  _can_tx_torque_request
-                  0x00381c                  _can_init
-                  0x003830                  _can_tx_disable_MC
-                  0x003854                  _ADC1_Initialize
-                  0x00392a                  _ADC1_SharedCorePowerEnable
-                  0x003946                  _ADC1_SetCommonInterruptHandler
-                  0x003976                  _ADC1_SetAPPS1InterruptHandler
-                  0x0039a8                  _ADC1_SetAPPS2InterruptHandler
-                  0x0039da                  _ADC1_SetCURRENT_DIGITALISHInterruptHandler
-                  0x003a0c                  _ADC1_SetBSE1InterruptHandler
-                  0x003a3e                  _ADC1_SetBSE2InterruptHandler
-                  0x003a70                  _ADC1_SetB_THRESHInterruptHandler
-                  0x003aa4                  _ADC1_Setchannel_AN16InterruptHandler
-                  0x003ab8                  _ADC1_Setchannel_AN17InterruptHandler
-                  0x003acc                  _ADC1_Setchannel_AN18InterruptHandler
-                  0x003ae0                  _ADC1_Setchannel_AN19InterruptHandler
-                  0x003af4                  _ADC1_Setchannel_AN20InterruptHandler
-                  0x003b00                  _print_state
-                  0x003c02                  _print_pedal_vals
-                  0x003c2c                  _clear_screen
-                  0x003c3a                  _gui_dump
-                  0x003c86                  _send_byte_with_escape
-                  0x003c9c                  _uart_write
-                  0x003cbc                  _RESET_GetCause
-                  0x003de0                  _RESET_CauseClearAll
-                  0x003ed2                  _UART1_Initialize
-                  0x003f04                  _UART1_Read
-                  0x003f22                  _UART1_Write
-                  0x003f38                  _UART1_IsRxReady
-                  0x003f4c                  _UART1_IsTxReady
-                  0x003f6c                  _UART1_IsTxDone
-                  0x003f84                  _UART1_StatusGet
-                  0x003f9e                  _UART1_Enable
-                  0x003faa                  _UART1_Disable
-                  0x003fb6                  _TMR1_Initialize
-                  0x003fda                  _TMR1_Period16BitSet
-                  0x003fec                  _TMR1_Period16BitGet
-                  0x003ff4                  _TMR1_Counter16BitSet
-                  0x004006                  _TMR1_Counter16BitGet
-                  0x004014                  _TMR1_SetInterruptHandler
-                  0x004024                  _TMR1_Start
-                  0x004034                  _TMR1_Stop
-                  0x00403e                  _TMR1_GetElapsedThenClear
-                  0x004056                  _TMR1_SoftwareCounterGet
-                  0x004062                  _TMR1_SoftwareCounterClear
-                  0x00406e                  _PIN_MANAGER_Initialize
-                  0x0040f6                  _change_state
-                  0x004110                  _report_fault
-                  0x004120                  _hv_requested
-                  0x004152                  _one_byte_state
-                  0x00416c                  _CLOCK_Initialize
-                  0x0041c2                  _CLOCK_AuxPllLockStatusGet
-                  0x0041da                  _INTERRUPT_Initialize
-                  0x00423a                  _SYSTEM_Initialize
-                  0x004256                  ___delay32
+                  0x0032e4                  _main
+                  0x0034c8                  _tmr1_ISR
+                  0x0034ea                  _traction_control_enable
+                  0x0034f4                  _hv_switch
+                  0x0034fe                  _drive_switch
+                  0x003508                  _shutdown_closed
+                  0x00352e                  _can_receive
+                  0x003752                  _can_tx_vcu_state
+                  0x003798                  _can_tx_torque_request
+                  0x003810                  _can_init
+                  0x003824                  _can_tx_disable_MC
+                  0x003848                  _ADC1_Initialize
+                  0x00391e                  _ADC1_SharedCorePowerEnable
+                  0x00393a                  _ADC1_SetCommonInterruptHandler
+                  0x00396a                  _ADC1_SetAPPS1InterruptHandler
+                  0x00399c                  _ADC1_SetAPPS2InterruptHandler
+                  0x0039ce                  _ADC1_SetCURRENT_DIGITALISHInterruptHandler
+                  0x003a00                  _ADC1_SetBSE1InterruptHandler
+                  0x003a32                  _ADC1_SetBSE2InterruptHandler
+                  0x003a64                  _ADC1_SetB_THRESHInterruptHandler
+                  0x003a98                  _ADC1_Setchannel_AN16InterruptHandler
+                  0x003aac                  _ADC1_Setchannel_AN17InterruptHandler
+                  0x003ac0                  _ADC1_Setchannel_AN18InterruptHandler
+                  0x003ad4                  _ADC1_Setchannel_AN19InterruptHandler
+                  0x003ae8                  _ADC1_Setchannel_AN20InterruptHandler
+                  0x003af4                  _print_state
+                  0x003bf6                  _print_pedal_vals
+                  0x003c20                  _clear_screen
+                  0x003c2e                  _gui_dump
+                  0x003c7a                  _send_byte_with_escape
+                  0x003c90                  _uart_write
+                  0x003cb0                  _RESET_GetCause
+                  0x003dd4                  _RESET_CauseClearAll
+                  0x003ec6                  _UART1_Initialize
+                  0x003ef8                  _UART1_Read
+                  0x003f16                  _UART1_Write
+                  0x003f2c                  _UART1_IsRxReady
+                  0x003f40                  _UART1_IsTxReady
+                  0x003f60                  _UART1_IsTxDone
+                  0x003f78                  _UART1_StatusGet
+                  0x003f92                  _UART1_Enable
+                  0x003f9e                  _UART1_Disable
+                  0x003faa                  _TMR1_Initialize
+                  0x003fce                  _TMR1_Period16BitSet
+                  0x003fe0                  _TMR1_Period16BitGet
+                  0x003fe8                  _TMR1_Counter16BitSet
+                  0x003ffa                  _TMR1_Counter16BitGet
+                  0x004008                  _TMR1_SetInterruptHandler
+                  0x004018                  _TMR1_Start
+                  0x004028                  _TMR1_Stop
+                  0x004032                  _TMR1_GetElapsedThenClear
+                  0x00404a                  _TMR1_SoftwareCounterGet
+                  0x004056                  _TMR1_SoftwareCounterClear
+                  0x004062                  _PIN_MANAGER_Initialize
+                  0x0040ea                  _change_state
+                  0x004104                  _report_fault
+                  0x004114                  _hv_requested
+                  0x004146                  _one_byte_state
+                  0x004160                  _CLOCK_Initialize
+                  0x0041b6                  _CLOCK_AuxPllLockStatusGet
+                  0x0041ce                  _INTERRUPT_Initialize
+                  0x00422e                  _SYSTEM_Initialize
+                  0x00424a                  ___delay32
                   0x02bf00                  __FSEC.sec
 
 External Symbols in Program Memory (by name):
 
-                  0x003854                  _ADC1_Initialize
-                  0x003976                  _ADC1_SetAPPS1InterruptHandler
-                  0x0039a8                  _ADC1_SetAPPS2InterruptHandler
-                  0x003a0c                  _ADC1_SetBSE1InterruptHandler
-                  0x003a3e                  _ADC1_SetBSE2InterruptHandler
-                  0x003a70                  _ADC1_SetB_THRESHInterruptHandler
-                  0x0039da                  _ADC1_SetCURRENT_DIGITALISHInterruptHandler
-                  0x003946                  _ADC1_SetCommonInterruptHandler
-                  0x003aa4                  _ADC1_Setchannel_AN16InterruptHandler
-                  0x003ab8                  _ADC1_Setchannel_AN17InterruptHandler
-                  0x003acc                  _ADC1_Setchannel_AN18InterruptHandler
-                  0x003ae0                  _ADC1_Setchannel_AN19InterruptHandler
-                  0x003af4                  _ADC1_Setchannel_AN20InterruptHandler
-                  0x00392a                  _ADC1_SharedCorePowerEnable
+                  0x003848                  _ADC1_Initialize
+                  0x00396a                  _ADC1_SetAPPS1InterruptHandler
+                  0x00399c                  _ADC1_SetAPPS2InterruptHandler
+                  0x003a00                  _ADC1_SetBSE1InterruptHandler
+                  0x003a32                  _ADC1_SetBSE2InterruptHandler
+                  0x003a64                  _ADC1_SetB_THRESHInterruptHandler
+                  0x0039ce                  _ADC1_SetCURRENT_DIGITALISHInterruptHandler
+                  0x00393a                  _ADC1_SetCommonInterruptHandler
+                  0x003a98                  _ADC1_Setchannel_AN16InterruptHandler
+                  0x003aac                  _ADC1_Setchannel_AN17InterruptHandler
+                  0x003ac0                  _ADC1_Setchannel_AN18InterruptHandler
+                  0x003ad4                  _ADC1_Setchannel_AN19InterruptHandler
+                  0x003ae8                  _ADC1_Setchannel_AN20InterruptHandler
+                  0x00391e                  _ADC1_SharedCorePowerEnable
                   0x0022ee                  _CAN1_Initialize
                   0x00260e                  _CAN1_IsBusOff
                   0x002656                  _CAN1_IsRxErrorActive
@@ -563,35 +563,35 @@ External Symbols in Program Memory (by name):
                   0x002ba2                  _CAN2_ReceivedMessageCountGet
                   0x002d00                  _CAN2_Sleep
                   0x002d34                  _CAN2_Tasks
-                  0x0041c2                  _CLOCK_AuxPllLockStatusGet
-                  0x00416c                  _CLOCK_Initialize
-                  0x0041da                  _INTERRUPT_Initialize
-                  0x00406e                  _PIN_MANAGER_Initialize
-                  0x003de0                  _RESET_CauseClearAll
-                  0x003cbc                  _RESET_GetCause
-                  0x00423a                  _SYSTEM_Initialize
+                  0x0041b6                  _CLOCK_AuxPllLockStatusGet
+                  0x004160                  _CLOCK_Initialize
+                  0x0041ce                  _INTERRUPT_Initialize
+                  0x004062                  _PIN_MANAGER_Initialize
+                  0x003dd4                  _RESET_CauseClearAll
+                  0x003cb0                  _RESET_GetCause
+                  0x00422e                  _SYSTEM_Initialize
                   0x001e5c                  _TC_torque_limit
                   0x001e72                  _THROTTLE_MAP
-                  0x004006                  _TMR1_Counter16BitGet
-                  0x003ff4                  _TMR1_Counter16BitSet
-                  0x00403e                  _TMR1_GetElapsedThenClear
-                  0x003fb6                  _TMR1_Initialize
-                  0x003fec                  _TMR1_Period16BitGet
-                  0x003fda                  _TMR1_Period16BitSet
-                  0x004014                  _TMR1_SetInterruptHandler
-                  0x004062                  _TMR1_SoftwareCounterClear
-                  0x004056                  _TMR1_SoftwareCounterGet
-                  0x004024                  _TMR1_Start
-                  0x004034                  _TMR1_Stop
-                  0x003faa                  _UART1_Disable
-                  0x003f9e                  _UART1_Enable
-                  0x003ed2                  _UART1_Initialize
-                  0x003f38                  _UART1_IsRxReady
-                  0x003f6c                  _UART1_IsTxDone
-                  0x003f4c                  _UART1_IsTxReady
-                  0x003f04                  _UART1_Read
-                  0x003f84                  _UART1_StatusGet
-                  0x003f22                  _UART1_Write
+                  0x003ffa                  _TMR1_Counter16BitGet
+                  0x003fe8                  _TMR1_Counter16BitSet
+                  0x004032                  _TMR1_GetElapsedThenClear
+                  0x003faa                  _TMR1_Initialize
+                  0x003fe0                  _TMR1_Period16BitGet
+                  0x003fce                  _TMR1_Period16BitSet
+                  0x004008                  _TMR1_SetInterruptHandler
+                  0x004056                  _TMR1_SoftwareCounterClear
+                  0x00404a                  _TMR1_SoftwareCounterGet
+                  0x004018                  _TMR1_Start
+                  0x004028                  _TMR1_Stop
+                  0x003f9e                  _UART1_Disable
+                  0x003f92                  _UART1_Enable
+                  0x003ec6                  _UART1_Initialize
+                  0x003f2c                  _UART1_IsRxReady
+                  0x003f60                  _UART1_IsTxDone
+                  0x003f40                  _UART1_IsTxReady
+                  0x003ef8                  _UART1_Read
+                  0x003f78                  _UART1_StatusGet
+                  0x003f16                  _UART1_Write
                   0x00041c                  __AddressError
                   0x0004f0                  __C1Interrupt
                   0x0004c6                  __C2Interrupt
@@ -606,7 +606,7 @@ External Symbols in Program Memory (by name):
                   0x000784                  ___addsf3
                   0x000784                  ___addsf3x
                   0x001652                  ___cvt_u
-                  0x004256                  ___delay32
+                  0x00424a                  ___delay32
                   0x001c2e                  ___divdi3
                   0x00094e                  ___divsf3
                   0x00094e                  ___divsf3x
@@ -673,47 +673,47 @@ External Symbols in Program Memory (by name):
                   0x0030c4                  _brake_implausible
                   0x003070                  _brake_mashed
                   0x00305e                  _braking
-                  0x00381c                  _can_init
-                  0x00353a                  _can_receive
-                  0x003830                  _can_tx_disable_MC
-                  0x0037a4                  _can_tx_torque_request
-                  0x00375e                  _can_tx_vcu_state
-                  0x0040f6                  _change_state
+                  0x003810                  _can_init
+                  0x00352e                  _can_receive
+                  0x003824                  _can_tx_disable_MC
+                  0x003798                  _can_tx_torque_request
+                  0x003752                  _can_tx_vcu_state
+                  0x0040ea                  _change_state
                   0x0031ae                  _clamp
-                  0x003c2c                  _clear_screen
-                  0x00350a                  _drive_switch
+                  0x003c20                  _clear_screen
+                  0x0034fe                  _drive_switch
                   0x002f2e                  _getConversion
-                  0x003c3a                  _gui_dump
+                  0x003c2e                  _gui_dump
                   0x003082                  _has_discrepancy
-                  0x004120                  _hv_requested
-                  0x003500                  _hv_switch
+                  0x004114                  _hv_requested
+                  0x0034f4                  _hv_switch
                   0x0031e0                  _init_sensors
                   0x001e5a                  _kD
                   0x001e59                  _kI
                   0x001e58                  _kP
-                  0x0032f0                  _main
+                  0x0032e4                  _main
                   0x000ec6                  _memcpy
                   0x000ed4                  _memset
-                  0x004152                  _one_byte_state
+                  0x004146                  _one_byte_state
                   0x001e4a                  _pi
-                  0x003c02                  _print_pedal_vals
-                  0x003b00                  _print_state
+                  0x003bf6                  _print_pedal_vals
+                  0x003af4                  _print_state
                   0x001e52                  _pulses_per_rev
-                  0x004110                  _report_fault
+                  0x004104                  _report_fault
                   0x002fbc                  _requested_throttle
                   0x002f64                  _run_calibration
-                  0x003c86                  _send_byte_with_escape
+                  0x003c7a                  _send_byte_with_escape
                   0x00303e                  _sensors_calibrated
-                  0x003514                  _shutdown_closed
+                  0x003508                  _shutdown_closed
                   0x0013fe                  _strlen
                   0x001e54                  _target_slip_ratio
                   0x003008                  _temp_attenuate
-                  0x0034d4                  _tmr1_ISR
+                  0x0034c8                  _tmr1_ISR
                   0x0018fa                  _tolower
                   0x001a6c                  _toupper
                   0x00320a                  _traction_control_PID
-                  0x0034f6                  _traction_control_enable
-                  0x003c9c                  _uart_write
+                  0x0034ea                  _traction_control_enable
+                  0x003c90                  _uart_write
                   0x003150                  _update_minmax
                   0x0030f2                  _update_percent
                   0x002f76                  _update_sensor_vals
@@ -5302,7 +5302,7 @@ _00000000087A3D20648274ce
  .const             0x9e72          0x8 build/default/production/sensors.o
                     0x9e72                  _THROTTLE_MAP
 
-.text             0x001e7a       0x1f6e
+.text             0x001e7a       0x1f62
  .text            0x001e7a        0x8d2 build/default/production/mcc_generated_files/can1.o
                   0x0022ee                  _CAN1_Initialize
                   0x00231c                  _CAN1_OperationModeSet
@@ -5360,117 +5360,117 @@ _00000000087A3D20648274ce
                   0x003150                  _update_minmax
                   0x0031ae                  _clamp
                   0x0031e0                  _init_sensors
- .text            0x00320a        0x330 build/default/production/main.o
+ .text            0x00320a        0x324 build/default/production/main.o
                   0x00320a                  _traction_control_PID
-                  0x0032f0                  _main
-                  0x0034d4                  _tmr1_ISR
-                  0x0034f6                  _traction_control_enable
-                  0x003500                  _hv_switch
-                  0x00350a                  _drive_switch
-                  0x003514                  _shutdown_closed
- .text            0x00353a        0x31a build/default/production/can_manager.o
-                  0x00353a                  _can_receive
-                  0x00375e                  _can_tx_vcu_state
-                  0x0037a4                  _can_tx_torque_request
-                  0x00381c                  _can_init
-                  0x003830                  _can_tx_disable_MC
- .text            0x003854        0x2ac build/default/production/mcc_generated_files/adc1.o
-                  0x003854                  _ADC1_Initialize
-                  0x00392a                  _ADC1_SharedCorePowerEnable
-                  0x003940                  _ADC1_CallBack
-                  0x003946                  _ADC1_SetCommonInterruptHandler
-                  0x003952                  _ADC1_Tasks
-                  0x00396e                  _ADC1_APPS1_CallBack
-                  0x003976                  _ADC1_SetAPPS1InterruptHandler
-                  0x003982                  _ADC1_APPS1_Tasks
-                  0x0039a0                  _ADC1_APPS2_CallBack
-                  0x0039a8                  _ADC1_SetAPPS2InterruptHandler
-                  0x0039b4                  _ADC1_APPS2_Tasks
-                  0x0039d2                  _ADC1_CURRENT_DIGITALISH_CallBack
-                  0x0039da                  _ADC1_SetCURRENT_DIGITALISHInterruptHandler
-                  0x0039e6                  _ADC1_CURRENT_DIGITALISH_Tasks
-                  0x003a04                  _ADC1_BSE1_CallBack
-                  0x003a0c                  _ADC1_SetBSE1InterruptHandler
-                  0x003a18                  _ADC1_BSE1_Tasks
-                  0x003a36                  _ADC1_BSE2_CallBack
-                  0x003a3e                  _ADC1_SetBSE2InterruptHandler
-                  0x003a4a                  _ADC1_BSE2_Tasks
-                  0x003a68                  _ADC1_B_THRESH_CallBack
-                  0x003a70                  _ADC1_SetB_THRESHInterruptHandler
-                  0x003a7c                  _ADC1_B_THRESH_Tasks
-                  0x003a9c                  _ADC1_channel_AN16_CallBack
-                  0x003aa4                  _ADC1_Setchannel_AN16InterruptHandler
-                  0x003ab0                  _ADC1_channel_AN17_CallBack
-                  0x003ab8                  _ADC1_Setchannel_AN17InterruptHandler
-                  0x003ac4                  _ADC1_channel_AN18_CallBack
-                  0x003acc                  _ADC1_Setchannel_AN18InterruptHandler
-                  0x003ad8                  _ADC1_channel_AN19_CallBack
-                  0x003ae0                  _ADC1_Setchannel_AN19InterruptHandler
-                  0x003aec                  _ADC1_channel_AN20_CallBack
-                  0x003af4                  _ADC1_Setchannel_AN20InterruptHandler
- .text            0x003b00        0x1bc build/default/production/uart.o
-                  0x003b00                  _print_state
-                  0x003c02                  _print_pedal_vals
-                  0x003c2c                  _clear_screen
-                  0x003c3a                  _gui_dump
-                  0x003c86                  _send_byte_with_escape
-                  0x003c9c                  _uart_write
- .text            0x003cbc        0x12c build/default/production/mcc_generated_files/reset.o
-                  0x003cbc                  _RESET_GetCause
-                  0x003cc4                  _RESET_CauseHandler
-                  0x003de0                  _RESET_CauseClearAll
+                  0x0032e4                  _main
+                  0x0034c8                  _tmr1_ISR
+                  0x0034ea                  _traction_control_enable
+                  0x0034f4                  _hv_switch
+                  0x0034fe                  _drive_switch
+                  0x003508                  _shutdown_closed
+ .text            0x00352e        0x31a build/default/production/can_manager.o
+                  0x00352e                  _can_receive
+                  0x003752                  _can_tx_vcu_state
+                  0x003798                  _can_tx_torque_request
+                  0x003810                  _can_init
+                  0x003824                  _can_tx_disable_MC
+ .text            0x003848        0x2ac build/default/production/mcc_generated_files/adc1.o
+                  0x003848                  _ADC1_Initialize
+                  0x00391e                  _ADC1_SharedCorePowerEnable
+                  0x003934                  _ADC1_CallBack
+                  0x00393a                  _ADC1_SetCommonInterruptHandler
+                  0x003946                  _ADC1_Tasks
+                  0x003962                  _ADC1_APPS1_CallBack
+                  0x00396a                  _ADC1_SetAPPS1InterruptHandler
+                  0x003976                  _ADC1_APPS1_Tasks
+                  0x003994                  _ADC1_APPS2_CallBack
+                  0x00399c                  _ADC1_SetAPPS2InterruptHandler
+                  0x0039a8                  _ADC1_APPS2_Tasks
+                  0x0039c6                  _ADC1_CURRENT_DIGITALISH_CallBack
+                  0x0039ce                  _ADC1_SetCURRENT_DIGITALISHInterruptHandler
+                  0x0039da                  _ADC1_CURRENT_DIGITALISH_Tasks
+                  0x0039f8                  _ADC1_BSE1_CallBack
+                  0x003a00                  _ADC1_SetBSE1InterruptHandler
+                  0x003a0c                  _ADC1_BSE1_Tasks
+                  0x003a2a                  _ADC1_BSE2_CallBack
+                  0x003a32                  _ADC1_SetBSE2InterruptHandler
+                  0x003a3e                  _ADC1_BSE2_Tasks
+                  0x003a5c                  _ADC1_B_THRESH_CallBack
+                  0x003a64                  _ADC1_SetB_THRESHInterruptHandler
+                  0x003a70                  _ADC1_B_THRESH_Tasks
+                  0x003a90                  _ADC1_channel_AN16_CallBack
+                  0x003a98                  _ADC1_Setchannel_AN16InterruptHandler
+                  0x003aa4                  _ADC1_channel_AN17_CallBack
+                  0x003aac                  _ADC1_Setchannel_AN17InterruptHandler
+                  0x003ab8                  _ADC1_channel_AN18_CallBack
+                  0x003ac0                  _ADC1_Setchannel_AN18InterruptHandler
+                  0x003acc                  _ADC1_channel_AN19_CallBack
+                  0x003ad4                  _ADC1_Setchannel_AN19InterruptHandler
+                  0x003ae0                  _ADC1_channel_AN20_CallBack
+                  0x003ae8                  _ADC1_Setchannel_AN20InterruptHandler
+ .text            0x003af4        0x1bc build/default/production/uart.o
+                  0x003af4                  _print_state
+                  0x003bf6                  _print_pedal_vals
+                  0x003c20                  _clear_screen
+                  0x003c2e                  _gui_dump
+                  0x003c7a                  _send_byte_with_escape
+                  0x003c90                  _uart_write
+ .text            0x003cb0        0x12c build/default/production/mcc_generated_files/reset.o
+                  0x003cb0                  _RESET_GetCause
+                  0x003cb8                  _RESET_CauseHandler
+                  0x003dd4                  _RESET_CauseClearAll
 
-.dinit            0x003de8         0xea
- .dinit           0x003de8         0xea data_init
+.dinit            0x003ddc         0xea
+ .dinit           0x003ddc         0xea data_init
 
-.text             0x003ed2        0x384
- .text            0x003ed2         0xe4 build/default/production/mcc_generated_files/uart1.o
-                  0x003ed2                  _UART1_Initialize
-                  0x003f04                  _UART1_Read
-                  0x003f22                  _UART1_Write
-                  0x003f38                  _UART1_IsRxReady
-                  0x003f4c                  _UART1_IsTxReady
-                  0x003f6c                  _UART1_IsTxDone
-                  0x003f84                  _UART1_StatusGet
-                  0x003f9e                  _UART1_Enable
-                  0x003faa                  _UART1_Disable
- .text            0x003fb6         0xb8 build/default/production/mcc_generated_files/tmr1.o
-                  0x003fb6                  _TMR1_Initialize
-                  0x003fda                  _TMR1_Period16BitSet
-                  0x003fec                  _TMR1_Period16BitGet
-                  0x003ff4                  _TMR1_Counter16BitSet
-                  0x004006                  _TMR1_Counter16BitGet
-                  0x00400e                  _TMR1_CallBack
-                  0x004014                  _TMR1_SetInterruptHandler
-                  0x004024                  _TMR1_Start
-                  0x004034                  _TMR1_Stop
-                  0x00403e                  _TMR1_GetElapsedThenClear
-                  0x004056                  _TMR1_SoftwareCounterGet
-                  0x004062                  _TMR1_SoftwareCounterClear
- .text            0x00406e         0x88 build/default/production/mcc_generated_files/pin_manager.o
-                  0x00406e                  _PIN_MANAGER_Initialize
- .text            0x0040f6         0x76 build/default/production/fsm.o
-                  0x0040f6                  _change_state
-                  0x004110                  _report_fault
-                  0x004120                  _hv_requested
-                  0x004152                  _one_byte_state
- .text            0x00416c         0x6e build/default/production/mcc_generated_files/clock.o
-                  0x00416c                  _CLOCK_Initialize
-                  0x0041c2                  _CLOCK_AuxPllLockStatusGet
- .text            0x0041da         0x42 build/default/production/mcc_generated_files/interrupt_manager.o
-                  0x0041da                  _INTERRUPT_Initialize
- .text            0x00421c         0x3a build/default/production/mcc_generated_files/system.o
-                  0x00423a                  _SYSTEM_Initialize
+.text             0x003ec6        0x384
+ .text            0x003ec6         0xe4 build/default/production/mcc_generated_files/uart1.o
+                  0x003ec6                  _UART1_Initialize
+                  0x003ef8                  _UART1_Read
+                  0x003f16                  _UART1_Write
+                  0x003f2c                  _UART1_IsRxReady
+                  0x003f40                  _UART1_IsTxReady
+                  0x003f60                  _UART1_IsTxDone
+                  0x003f78                  _UART1_StatusGet
+                  0x003f92                  _UART1_Enable
+                  0x003f9e                  _UART1_Disable
+ .text            0x003faa         0xb8 build/default/production/mcc_generated_files/tmr1.o
+                  0x003faa                  _TMR1_Initialize
+                  0x003fce                  _TMR1_Period16BitSet
+                  0x003fe0                  _TMR1_Period16BitGet
+                  0x003fe8                  _TMR1_Counter16BitSet
+                  0x003ffa                  _TMR1_Counter16BitGet
+                  0x004002                  _TMR1_CallBack
+                  0x004008                  _TMR1_SetInterruptHandler
+                  0x004018                  _TMR1_Start
+                  0x004028                  _TMR1_Stop
+                  0x004032                  _TMR1_GetElapsedThenClear
+                  0x00404a                  _TMR1_SoftwareCounterGet
+                  0x004056                  _TMR1_SoftwareCounterClear
+ .text            0x004062         0x88 build/default/production/mcc_generated_files/pin_manager.o
+                  0x004062                  _PIN_MANAGER_Initialize
+ .text            0x0040ea         0x76 build/default/production/fsm.o
+                  0x0040ea                  _change_state
+                  0x004104                  _report_fault
+                  0x004114                  _hv_requested
+                  0x004146                  _one_byte_state
+ .text            0x004160         0x6e build/default/production/mcc_generated_files/clock.o
+                  0x004160                  _CLOCK_Initialize
+                  0x0041b6                  _CLOCK_AuxPllLockStatusGet
+ .text            0x0041ce         0x42 build/default/production/mcc_generated_files/interrupt_manager.o
+                  0x0041ce                  _INTERRUPT_Initialize
+ .text            0x004210         0x3a build/default/production/mcc_generated_files/system.o
+                  0x00422e                  _SYSTEM_Initialize
 
-.init.delay32     0x004256         0x1c
- .init.delay32    0x004256         0x1c c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(delay32ch.Meo)
-                  0x004256                  ___delay32
+.init.delay32     0x00424a         0x1c
+ .init.delay32    0x00424a         0x1c c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(delay32ch.Meo)
+                  0x00424a                  ___delay32
 
-.text             0x004272         0x18
- .text            0x004272         0x18 build/default/production/mcc_generated_files/traps.o
-                  0x004272                  _TRAPS_halt_on_error
+.text             0x004266         0x18
+ .text            0x004266         0x18 build/default/production/mcc_generated_files/traps.o
+                  0x004266                  _TRAPS_halt_on_error
 
 data_init_dualch.S.scn1
-                  0x00428a          0x2
+                  0x00427e          0x2
  data_init_dualch.S.scn1
-                  0x00428a          0x2 c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(data_init_dualch.o)
+                  0x00427e          0x2 c:/program files/microchip/xc16/v2.00/bin/bin/../../lib\libc99-pic30-elf.a(data_init_dualch.o)

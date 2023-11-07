@@ -52,7 +52,7 @@ void traction_control_PID() {
     
     // limit PID torque request
     if (TC_control_var > TC_torque_limit) TC_control_var = TC_torque_limit;
-    else if (TC_control_var < TC_torque_limit) TC_control_var = TC_torque_limit;
+    if (TC_control_var < 0) TC_control_var = 0; // not the best way but works for now
     
     TC_torque_adjustment = TC_control_var;
    
