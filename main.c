@@ -68,9 +68,9 @@ int main(void)
         
         can_tx_vcu_state();
 
-        if (!mc_lockout) {
-            can_tx_torque_request();
-        }
+        //if (!mc_lockout) {
+        can_tx_torque_request();
+        //}
         
         // Traction control
         if (traction_control_enable()) {
@@ -88,13 +88,14 @@ int main(void)
         }
         
         if (mc_fault) {
-            report_fault(MC_FAULT);
+            //report_fault(MC_FAULT);
         }
         
         //clear_screen();
         //print_state();
         //print_pedal_vals();
-        //gui_dump();
+        //
+        gui_dump();
         //printf("%u\r\n", switches);
         
         switch (state) {
@@ -127,13 +128,13 @@ int main(void)
                 
                 break;
             case PRECHARGING:
-                if (capacitor_volt > PRECHARGE_THRESHOLD) {
+                if ((shutdown_flags & 0x07) == 0b110) {
                     // Finished charging to HV on time
                     change_state(HV_ENABLED);
                     break;
                 }
                 if (!hv_switch()) {
-                    // Driver flipped off HV switch
+                    // Driver flipped off HV swi1tch
                     change_state(LV);
                     break;
                 }
@@ -165,9 +166,9 @@ int main(void)
                 break;
             case DRIVE:
                 // CM200 safety feature: starts in lockout mode, disable message must be sent before enable (torque requests)
-                if (mc_lockout) {
-                    can_tx_disable_MC();
-                }
+                //if (mc_lockout) {
+                //    can_tx_disable_MC();
+                //}
                 
                 if (!drive_switch()) {
                     // Drive switch was flipped off

@@ -22,6 +22,13 @@ void report_fault(error_t _error) {
     error = _error;
 }
 
+uint8_t inverter_enable() {
+    return (state == DRIVE)
+        || (error == SENSOR_DISCREPANCY)
+        || (error == BRAKE_IMPLAUSIBLE);
+
+}
+
 uint8_t hv_requested(){
     return (state == PRECHARGING)
         || (state == HV_ENABLED)

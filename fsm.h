@@ -37,6 +37,7 @@ typedef enum {
 void change_state(const state_t new_state);
 void report_fault(error_t _error);
 uint8_t hv_requested();
+uint8_t inverter_enable();
 uint8_t one_byte_state();
 
 #endif	/* FSM_H */

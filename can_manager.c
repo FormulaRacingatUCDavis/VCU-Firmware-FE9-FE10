@@ -13,12 +13,18 @@ volatile uint8_t estop_flags = 0;
 volatile uint8_t switches = 0xC0;   //start with switches on to stay in startup state
 volatile uint8_t PACK_TEMP;
 volatile uint8_t mc_fault;
+volatile uint8_t power_limit = 0;
+volatile int16_t motor_rpm = 0;
 
 // From TCAN
 volatile uint16_t front_right_wheel_speed = 0;
 volatile uint16_t front_left_wheel_speed = 0;
 volatile uint16_t back_right_wheel_speed = 0;
 volatile uint16_t back_left_wheel_speed = 0;
+
+extern CALIBRATED_SENSOR_t throttle1;
+extern CALIBRATED_SENSOR_t throttle2;
+extern CALIBRATED_SENSOR_t brake;
 
 // receive buffer message
 CAN_MSG_OBJ msg_RX;
@@ -29,7 +35,7 @@ CAN_MSG_OBJ msg_RX;
 CAN_MSG_FIELD field_TX_mc_command = {
     .idType = 0,
     .frameType = 0,
-    .dlc = 6,
+    .dlc = 8,
     .formatType = 0,
     .brs = 0
 };
@@ -42,7 +48,7 @@ CAN_MSG_OBJ msg_TX_mc_command = {
 CAN_MSG_FIELD field_TX_vcu_state = {
     .idType = 0,
     .frameType = 0,
-    .dlc = 8,
+    .dlc = 6,
     .formatType = 0,
     .brs = 0
 };
@@ -57,9 +63,11 @@ CAN_MSG_OBJ msg_TX_vcu_state = {
 void can_receive() {
     // gets message and updates values
     if (CAN1_Receive(&msg_RX)) {
+        printf("ID: %x\n", msg_RX.msgId);
         switch (msg_RX.msgId) {
             case DRIVER_SWITCHES:
                 switches = msg_RX.data[0]; 
+                torque_limit = msg_RX.data[1];
                 break;
             case BMS_STATUS_MSG:
                 PACK_TEMP = msg_RX.data[0];
@@ -86,18 +94,21 @@ void can_receive() {
                         mc_fault = 0;
                     }
                 }
+            case 0x0A5: //motor speed
+                motor_rpm = msg_RX.data[2] + 256*msg_RX.data[3];
+                
             default:
                 // no valid input received
                 break;
         }
-        printf("ID: %d \n\r", msg_RX.msgId);
+        //printf("ID: %d \n\r", msg_RX.msgId);
         for (uint8_t i = 1; i < msg_RX.field.dlc; i++) {
-            printf("byte %d: %d\n\r", i, msg_RX.data[i]);
+            //printf("byte %d: %d\n\r", i, msg_RX.data[i]);
         }
-        printf("\n\r");
+        //printf("\n\r");
     } 
     else {
-        printf("No message received.\n\r");
+        //printf("No message received.\n\r");
     }
     
     if (CAN2_Receive(&msg_RX)) {
@@ -128,12 +139,12 @@ void can_receive() {
 //  CAN transmit torque request command
 void can_tx_vcu_state(){
         uint8_t data_TX_state[6] = {
-        0,
-        0,
-        0,
-        0,
+        hv_requested(),
+        throttle1.percent,
+        throttle2.percent,
+        brake.percent,
         one_byte_state(), 
-        braking()
+        0
     };
 
     msg_TX_vcu_state.field = field_TX_vcu_state; 
@@ -145,11 +156,16 @@ void can_tx_torque_request(){
     
     uint16_t throttle_msg_byte = 0;
     if (state == DRIVE) {
+<<<<<<< Updated upstream
         throttle_msg_byte = requested_throttle() - TC_torque_adjustment;
+=======
+        throttle_msg_byte = requested_throttle();// + TC_torque_adjustment;
+>>>>>>> Stashed changes
     }
+    printf("%u\n", throttle_msg_byte); 
     
     uint8_t byte5 = 0b010;   //speed mode | discharge_enable | inverter enable
-    byte5 |= (hv_requested() & 0x01);  //set inverter enable bit
+    byte5 |= (inverter_enable() & 0x01);  //set inverter enable bit
     
     uint8_t data_TX_torque[8] = {
         (uint8_t)(throttle_msg_byte & 0xff), // 0 - torque command lower (Nm*10)
@@ -178,7 +194,7 @@ void can_init(){
 }
 
 void can_tx_disable_MC() {
-    uint8_t data_TX_disable_mc[] = { 0, 0, 0, 0, 0, 0, 0 };
+    uint8_t data_TX_disable_mc[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
     msg_TX_mc_command.field = field_TX_mc_command; 
     msg_TX_mc_command.data = data_TX_disable_mc;

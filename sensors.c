@@ -6,9 +6,13 @@
  */
 
 #include "sensors.h"
+#include "stdio.h"
+#include "can_manager.h"
 
 extern volatile state_t state;
 extern volatile error_t error;
+extern volatile uint8_t power_limit;
+extern volatile int16_t motor_rpm;
 
 CALIBRATED_SENSOR_t throttle1;
 CALIBRATED_SENSOR_t throttle2;
@@ -78,11 +82,32 @@ void update_sensor_vals() {
     }
 }
 
+uint16_t torque_limit(void)
+{
+    float power_kw = (float)power_limit*(80.0f/255.0f);
+    
+    if(motor_rpm == 0){
+        motor_rpm = 1; //prevent divide by zero
+    }
+    else if(motor_rpm < 0){
+        motor_rpm = -1*motor_rpm;
+    }
+    
+    float torque_nm = 9.5488f*power_kw/motor_rpm;  // stole this from online calculator
+    uint16_t torque = 10*((uint16_t)torque_nm);
+    
+    if(torque > MAX_TORQUE){
+        torque = MAX_TORQUE;
+    }
+    
+    return torque;
+}
+
 uint16_t requested_throttle(){
     temp_attenuate();
-    
-    uint32_t throttle = ((uint32_t)throttle1.percent * MAX_TORQUE) / 100;  //upscale for MC code
+    uint32_t throttle = ((uint32_t)throttle1.percent * torque_limit()) / 100;  //upscale for MC code
     throttle = (throttle * THROTTLE_MULTIPLIER) / 100;       //attenuate for temperature
+
     return (uint16_t)throttle;
 }
 
@@ -98,8 +123,9 @@ void temp_attenuate() {
 }
 
 bool sensors_calibrated(){
-    if(throttle2.range < APPS1_MIN_RANGE) return 0;
-    if(brake.range < BRAKE_MIN_RANGE) return 0;
+    if(throttle1.range < APPS1_MIN_RANGE) return 0;
+    if(throttle2.range < APPS2_MIN_RANGE) return 0;
+    //if(brake.range < BRAKE_MIN_RANGE) return 0;
     
     return 1;
 }
@@ -116,7 +142,7 @@ bool brake_mashed(){
 // returns true only if the sensor discrepancy is > 10%
 // Note: after verifying there's no discrepancy, can use either sensor(1 or 2) for remaining checks
 bool has_discrepancy() {
-    if(abs((int)throttle1.percent - (int)throttle2.percent) > 10) return 1;  //percentage discrepancy
+    if(abs((int)throttle1.percent - (int)throttle2.percent) > MAX_DISCREPANCY_PERCENT) return 1;  //percentage discrepancy
     
     return (throttle1.raw < APPS_OPEN_THRESH)
         || (throttle1.raw > APPS_SHORT_THRESH)

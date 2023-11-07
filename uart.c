@@ -70,13 +70,14 @@ void print_state(){
 }
 
 void print_pedal_vals(){
-    printf("APPS1: %u%%\n\r", throttle1.percent);
+    //printf("APPS1: %u%%\n\r", throttle1.percent);
     //printf("RAW: %u%%\n\r", throttle1.raw);
     //printf("MIN: %u%%\n\r", throttle1.min);
     //printf("MAX: %u%%\n\r", throttle1.max);
-    //printf("RANGE: %u%%\n\r", throttle1.range);
-    printf("APPS2: %u%%\n\r", throttle2.percent);
-    printf("BRAKE: %u%%\n\r", brake.percent);
+    printf("APPS1: %u\n\r", throttle1.range);
+    printf("APPS2: %u\n\r", throttle2.range);
+    //printf("APPS2: %u%%\n\r", throttle2.percent);
+    //printf("BRAKE: %u%%\n\r", brake.percent);
     //printf("STATE: %u", state);
 }
 
@@ -98,6 +99,9 @@ void gui_dump(){
     send_byte_with_escape(0xFF&bms_volt);
     send_byte_with_escape(0xFF&(capacitor_volt>>8));
     send_byte_with_escape(0xFF&capacitor_volt);
+    send_byte_with_escape(0xFF&(brake.raw>>8));
+    send_byte_with_escape(0xFF&brake.raw);
+
     
     uart_write(ESCAPE_CHAR);
     uart_write(FRAME_END);
